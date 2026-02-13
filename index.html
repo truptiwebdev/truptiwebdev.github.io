@@ -1,99 +1,69 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Trupti | Full Stack Developer</title>
-    <link rel="stylesheet" href="style.css">
+<!-- EXPERIENCE SECTION -->
+<section class="experience">
+    <h2>Professional Experience</h2>
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Swiper Carousel CDN -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-    />
-</head>
-<body>
-
-<!-- HERO -->
-<section class="hero">
-    <h1>Hi, I'm Trupti ✨</h1>
-    <p>Full Stack Developer creating modern & aesthetic web experiences.</p>
-</section>
-
-<!-- CAROUSEL PROJECTS -->
-<section class="projects">
-    <h2>Featured Work</h2>
-
-    <div class="swiper mySwiper">
+    <div class="swiper expSwiper">
         <div class="swiper-wrapper">
 
+            <!-- TEMPCON -->
             <div class="swiper-slide">
-                <div class="project-card">
-                    <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=900">
-                    <div class="overlay">
-                        <h3>CRM Dashboard</h3>
-                        <p>Laravel + React admin system with optimized APIs and analytics.</p>
+                <div class="exp-container">
+                    <div class="exp-image">
+                        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=900">
+                    </div>
+                    <div class="exp-content">
+                        <h3>Full Stack Developer</h3>
+                        <h4>TEMPCON EXPRESS PVT. LTD</h4>
+                        <p>
+                            Built and maintained in-house CRM system "Tempex".
+                            Developed React frontend architecture and Laravel backend using ORM (Eloquent).
+                            Designed scalable REST APIs and optimized database queries.
+                        </p>
+                        <p><strong>Tech:</strong> React, Laravel, MySQL, Git, Docker, Jenkins</p>
                     </div>
                 </div>
             </div>
 
+            <!-- TECHEXCEL -->
             <div class="swiper-slide">
-                <div class="project-card">
-                    <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=900">
-                    <div class="overlay">
-                        <h3>E-Commerce Platform</h3>
-                        <p>Secure order management system with payment integration.</p>
+                <div class="exp-container">
+                    <div class="exp-image">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=900">
+                    </div>
+                    <div class="exp-content">
+                        <h3>Software Developer</h3>
+                        <h4>TECHEXCEL SOFTWARE SOLUTIONS</h4>
+                        <p>
+                            Developed high-performance stock market REST APIs.
+                            Improved response time by 30% through query optimization.
+                            Supported CI/CD pipelines using Jenkins and Docker.
+                        </p>
+                        <p><strong>Tech:</strong> Laravel, MySQL, Jenkins, Docker</p>
                     </div>
                 </div>
             </div>
 
+            <!-- LOKE -->
             <div class="swiper-slide">
-                <div class="project-card">
-                    <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=900">
-                    <div class="overlay">
-                        <h3>Analytics Platform</h3>
-                        <p>High-performance REST APIs with real-time data visualization.</p>
+                <div class="exp-container">
+                    <div class="exp-image">
+                        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900">
                     </div>
-                </div>
-            </div>
-
-            <div class="swiper-slide">
-                <div class="project-card">
-                    <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900">
-                    <div class="overlay">
-                        <h3>Startup Landing Page</h3>
-                        <p>Modern responsive UI with smooth animations and conversion focus.</p>
+                    <div class="exp-content">
+                        <h3>Software Engineer</h3>
+                        <h4>LOKE INFOSOLUTIONS</h4>
+                        <p>
+                            Designed REST APIs for Video-on-Demand education platform.
+                            Built scalable backend for e-commerce and enterprise systems.
+                            Improved streaming efficiency by 25%.
+                        </p>
+                        <p><strong>Tech:</strong> Laravel, MySQL, Git</p>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <!-- Navigation -->
         <div class="swiper-pagination"></div>
     </div>
 </section>
-
-<section class="contact">
-    <h2>Let’s Collaborate</h2>
-    <p>📩 mishratrupti971@gmail.com</p>
-</section>
-
-<!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-<script>
-var swiper = new Swiper(".mySwiper", {
-  slidesPerView: 1,
-  spaceBetween: 30,
-  loop: true,
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-});
-</script>
-
-</body>
-</html>
