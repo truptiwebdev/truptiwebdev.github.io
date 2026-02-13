@@ -1,76 +1,53 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.experience {
+    padding: 100px 10%;
+    background: white;
 }
 
-body {
-    font-family: 'Outfit', sans-serif;
-    background: linear-gradient(135deg, #fdf2f8, #e0f2fe);
-    color: #111;
-}
-
-/* HERO */
-.hero {
+.experience h2 {
     text-align: center;
-    padding: 120px 20px;
+    margin-bottom: 60px;
+    font-size: 32px;
 }
 
-.hero h1 {
-    font-size: 48px;
+.exp-container {
+    display: flex;
+    align-items: center;
+    gap: 50px;
 }
 
-.hero p {
-    margin-top: 15px;
-    opacity: 0.7;
-}
-
-/* PROJECT SECTION */
-.projects {
-    padding: 80px 10%;
-}
-
-.projects h2 {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-/* PROJECT CARD */
-.project-card {
-    position: relative;
+.exp-image img {
+    width: 500px;
     border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.project-card img {
-    width: 100%;
-    height: 400px;
     object-fit: cover;
-    transition: 0.4s;
 }
 
-/* Hover zoom */
-.project-card:hover img {
-    transform: scale(1.1);
+.exp-content {
+    max-width: 500px;
 }
 
-/* Overlay */
-.overlay {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding: 30px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.7));
-    color: white;
-}
-
-.overlay h3 {
+.exp-content h3 {
+    font-size: 24px;
     margin-bottom: 10px;
 }
 
-/* Contact */
-.contact {
-    text-align: center;
-    padding: 100px 20px;
+.exp-content h4 {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.exp-content p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media(max-width: 900px){
+    .exp-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .exp-image img {
+        width: 100%;
+    }
 }
