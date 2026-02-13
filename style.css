@@ -3,12 +3,12 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
 }
 
 body {
   background: #0f0f0f;
-  color: #ffffff;
-  line-height: 1.6;
+  color: #fff;
 }
 
 .container {
@@ -17,6 +17,31 @@ body {
   margin: auto;
 }
 
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  width: 100%;
+  padding: 20px 8%;
+  display: flex;
+  justify-content: space-between;
+  background: rgba(15,15,15,0.7);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* HERO */
 .hero {
   height: 100vh;
   display: flex;
@@ -29,78 +54,78 @@ body {
 }
 
 .hero h2 {
-  font-size: 1.5rem;
+  margin: 20px 0;
   font-weight: 400;
-  margin: 15px 0;
-  color: #b3b3b3;
-}
-
-.hero p {
-  margin-bottom: 30px;
-  color: #999;
+  color: #aaa;
 }
 
 .btn {
-  display: inline-block;
   padding: 12px 28px;
-  background: #ffffff;
-  color: #000;
+  background: white;
+  color: black;
   text-decoration: none;
-  font-weight: 600;
   border-radius: 4px;
   transition: 0.3s;
 }
 
 .btn:hover {
-  background: #dddddd;
+  background: #ddd;
 }
 
+/* SECTIONS */
 .section {
-  padding: 100px 0;
+  padding: 120px 0;
 }
 
 .section h3 {
   font-size: 2rem;
-  margin-bottom: 30px;
-}
-
-.experience {
   margin-bottom: 40px;
 }
 
-.experience h4 {
-  font-size: 1.3rem;
+/* PROJECTS */
+.project {
+  display: flex;
+  gap: 50px;
+  margin-bottom: 100px;
+  align-items: center;
 }
 
-.experience span {
-  font-size: 0.9rem;
-  color: #999;
+.project.reverse {
+  flex-direction: row-reverse;
 }
 
-.experience p {
-  margin-top: 10px;
-  color: #ccc;
+.project img {
+  width: 50%;
+  border-radius: 10px;
+  transition: 0.4s;
 }
 
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 20px;
+.project img:hover {
+  transform: scale(1.05);
 }
 
-.skills-grid div {
-  padding: 15px;
-  background: #1a1a1a;
-  text-align: center;
-  border-radius: 6px;
-  transition: 0.3s;
+.project-content {
+  width: 50%;
 }
 
-.skills-grid div:hover {
-  background: #2a2a2a;
-}
-
-.contact p {
-  margin-bottom: 20px;
+.project-content span {
   color: #aaa;
+  font-size: 0.9rem;
+}
+
+/* CONTACT */
+.contact {
+  text-align: center;
+}
+
+/* ANIMATION */
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 1s ease;
+}
+
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
 }
