@@ -3,52 +3,97 @@
 <head>
     <title>Trupti | Full Stack Developer</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Swiper Carousel CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
 </head>
 <body>
 
+<!-- HERO -->
 <section class="hero">
-    <div class="hero-content">
-        <h1>Hi, I'm Trupti ✨</h1>
-        <p>Full Stack Developer building aesthetic & scalable web apps.</p>
-        <a href="#projects" class="btn">View My Work</a>
-    </div>
+    <h1>Hi, I'm Trupti ✨</h1>
+    <p>Full Stack Developer creating modern & aesthetic web experiences.</p>
 </section>
 
-<section id="projects" class="projects">
-    <h2>Selected Projects</h2>
+<!-- CAROUSEL PROJECTS -->
+<section class="projects">
+    <h2>Featured Work</h2>
 
-    <div class="grid">
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900">
-            <div class="card-text">
-                <h3>Modern CRM</h3>
-                <p>Clean dashboard built with Laravel & React.</p>
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=900">
+                    <div class="overlay">
+                        <h3>CRM Dashboard</h3>
+                        <p>Laravel + React admin system with optimized APIs and analytics.</p>
+                    </div>
+                </div>
             </div>
+
+            <div class="swiper-slide">
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=900">
+                    <div class="overlay">
+                        <h3>E-Commerce Platform</h3>
+                        <p>Secure order management system with payment integration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper-slide">
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=900">
+                    <div class="overlay">
+                        <h3>Analytics Platform</h3>
+                        <p>High-performance REST APIs with real-time data visualization.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper-slide">
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=900">
+                    <div class="overlay">
+                        <h3>Startup Landing Page</h3>
+                        <p>Modern responsive UI with smooth animations and conversion focus.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=900">
-            <div class="card-text">
-                <h3>E-Commerce UI</h3>
-                <p>Minimal shopping experience with smooth UX.</p>
-            </div>
-        </div>
-
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=900">
-            <div class="card-text">
-                <h3>Analytics Platform</h3>
-                <p>Data visualization & high-performance APIs.</p>
-            </div>
-        </div>
+        <!-- Navigation -->
+        <div class="swiper-pagination"></div>
     </div>
 </section>
 
 <section class="contact">
-    <h2>Let’s Connect</h2>
+    <h2>Let’s Collaborate</h2>
     <p>📩 mishratrupti971@gmail.com</p>
 </section>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+var swiper = new Swiper(".mySwiper", {
+  slidesPerView: 1,
+  spaceBetween: 30,
+  loop: true,
+  pagination: {
+    el: ".swiper-pagination",
+    clickable: true,
+  },
+});
+</script>
 
 </body>
 </html>
