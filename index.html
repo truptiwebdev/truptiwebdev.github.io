@@ -13,86 +13,92 @@
 
 <body>
 
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">Trupti.</div>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Work</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
   <!-- HERO -->
   <section class="hero">
-    <div class="container">
+    <div class="container fade-in">
       <h1>Hi, I'm Trupti.</h1>
-      <h2>I build scalable & aesthetic web experiences.</h2>
-      <p>Full Stack Developer specializing in Laravel, React & MySQL.</p>
-      <a href="#contact" class="btn">Let’s Work Together</a>
+      <h2>I design & build modern web experiences.</h2>
+      <a href="#projects" class="btn">View My Work</a>
     </div>
   </section>
 
   <!-- ABOUT -->
-  <section class="section">
+  <section id="about" class="section fade-in">
     <div class="container">
       <h3>About Me</h3>
       <p>
-        I am a Full Stack Developer with experience building dynamic web applications,
-        REST APIs, admin dashboards, and scalable business platforms.
-        I focus on clean architecture, performance optimization, and user experience.
+        Full Stack Developer experienced in Laravel, React, and MySQL.
+        I build scalable business platforms, REST APIs, dashboards, and performance-driven web apps.
       </p>
     </div>
   </section>
 
-  <!-- EXPERIENCE -->
-  <section class="section">
+  <!-- PROJECTS -->
+  <section id="projects" class="section">
     <div class="container">
-      <h3>Experience</h3>
+      <h3 class="fade-in">Featured Work</h3>
 
-      <div class="experience">
-        <h4>Full Stack Developer</h4>
-        <span>TEMPCON EXPRESS PVT. LTD</span>
-        <p>
-          Developed and maintained business web applications using Laravel and MySQL.
-          Built internal dashboards and optimized backend performance.
-        </p>
+      <!-- Project 1 -->
+      <div class="project fade-in">
+        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c" alt="">
+        <div class="project-content">
+          <h4>Logistics Management System</h4>
+          <p>
+            Built a full logistics tracking system using Laravel & MySQL.
+            Includes admin dashboard, shipment tracking & analytics.
+          </p>
+          <span>Laravel • MySQL • REST API</span>
+        </div>
       </div>
 
-      <div class="experience">
-        <h4>Backend Developer</h4>
-        <span>Previous Company</span>
-        <p>
-          Designed REST APIs and integrated third-party services.
-          Improved system reliability and database structure.
-        </p>
+      <!-- Project 2 -->
+      <div class="project reverse fade-in">
+        <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085" alt="">
+        <div class="project-content">
+          <h4>Business Admin Dashboard</h4>
+          <p>
+            Developed dynamic admin panels with authentication,
+            reporting modules & database optimization.
+          </p>
+          <span>PHP • React • MySQL</span>
+        </div>
       </div>
 
-      <div class="experience">
-        <h4>Junior Developer</h4>
-        <span>First Company</span>
-        <p>
-          Assisted in frontend-backend integration and feature development
-          using PHP and JavaScript technologies.
-        </p>
+      <!-- Project 3 -->
+      <div class="project fade-in">
+        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" alt="">
+        <div class="project-content">
+          <h4>E-Commerce Platform</h4>
+          <p>
+            Created scalable e-commerce solution with cart system,
+            payment integration & product management.
+          </p>
+          <span>Laravel • React • Stripe</span>
+        </div>
       </div>
 
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section class="section skills">
-    <div class="container">
-      <h3>Tech Stack</h3>
-      <div class="skills-grid">
-        <div>Laravel</div>
-        <div>React</div>
-        <div>PHP</div>
-        <div>MySQL</div>
-        <div>Git</div>
-        <div>Docker</div>
-      </div>
     </div>
   </section>
 
   <!-- CONTACT -->
-  <section class="section contact" id="contact">
+  <section id="contact" class="section contact fade-in">
     <div class="container">
-      <h3>Contact</h3>
-      <p>Let’s build something impactful together.</p>
+      <h3>Let's Work Together</h3>
+      <p>Available for freelance & full-time opportunities.</p>
       <a href="mailto:mishratrupti971@gmail.com" class="btn">Email Me</a>
     </div>
   </section>
 
+  <script src="script.js"></script>
 </body>
 </html>
