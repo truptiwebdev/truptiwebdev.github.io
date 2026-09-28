@@ -329,8 +329,9 @@ export default function App() {
   const [modalType, setModalType] = useState("demo");
   const reduce = useReducedMotion();
 
+  // Rabbit + curtains need ~2.6s
   useEffect(() => {
-    const timer = setTimeout(() => setPageLoading(false), 800);
+    const timer = setTimeout(() => setPageLoading(false), 2600);
     return () => clearTimeout(timer);
   }, []);
 
@@ -370,18 +371,92 @@ export default function App() {
           transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] },
         };
 
+  /* ===================== RABBIT + CURTAINS LOADING ===================== */
   if (pageLoading) {
     return (
-      <div className="fixed inset-0 bg-white flex flex-col items-center justify-center z-[9999]">
-        <motion.p
-          style={serif}
-          className="text-2xl md:text-3xl font-medium text-stone-700 tracking-wide"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
+      <div className="fixed inset-0 z-[9999] overflow-hidden bg-[#faf8f5]">
+        {/* Soft stage background */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 60%, #fff9f5 0%, #f5f0eb 50%, #ebe6e0 100%)",
+          }}
+        />
+
+        {/* Center — rabbit + text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
+          <motion.div
+            initial={{ scale: 0.6, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="text-7xl md:text-8xl select-none"
+          >
+            🐰
+          </motion.div>
+
+          <motion.p
+            style={serif}
+            className="mt-5 text-2xl md:text-3xl font-medium text-stone-700 tracking-wide"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.5 }}
+          >
+            Opening for you…
+          </motion.p>
+        </div>
+
+        {/* LEFT CURTAIN */}
+        <motion.div
+          className="absolute top-0 left-0 bottom-0 w-1/2 z-30 origin-left"
+          style={{
+            background:
+              "linear-gradient(90deg, #e8dfd6 0%, #f0e9e2 40%, #f7f2ec 100%)",
+            boxShadow: "8px 0 40px rgba(0,0,0,0.12)",
+            borderRight: "1px solid rgba(0,0,0,0.06)",
+          }}
+          initial={{ x: "0%" }}
+          animate={{ x: "-100%" }}
+          transition={{
+            delay: 0.9,
+            duration: 1.4,
+            ease: [0.65, 0, 0.35, 1],
+          }}
         >
-          Loading
-        </motion.p>
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 30px)",
+            }}
+          />
+        </motion.div>
+
+        {/* RIGHT CURTAIN */}
+        <motion.div
+          className="absolute top-0 right-0 bottom-0 w-1/2 z-30 origin-right"
+          style={{
+            background:
+              "linear-gradient(270deg, #e8dfd6 0%, #f0e9e2 40%, #f7f2ec 100%)",
+            boxShadow: "-8px 0 40px rgba(0,0,0,0.12)",
+            borderLeft: "1px solid rgba(0,0,0,0.06)",
+          }}
+          initial={{ x: "0%" }}
+          animate={{ x: "100%" }}
+          transition={{
+            delay: 0.9,
+            duration: 1.4,
+            ease: [0.65, 0, 0.35, 1],
+          }}
+        >
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 30px)",
+            }}
+          />
+        </motion.div>
       </div>
     );
   }
@@ -898,7 +973,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* TESTIMONIALS — strong visible backgrounds */}
+      {/* TESTIMONIALS */}
       <section id="testimonials" className="py-28 px-6 border-t border-stone-100 relative">
         <div className="max-w-6xl mx-auto">
           <Heading title="Client Feedback" text="Real project experiences from clients I've worked with." />
@@ -906,8 +981,6 @@ export default function App() {
             {testimonials.map(([mark, quote, who, project, bgImage], i) => (
               <Reveal key={who} delay={i * 0.06} hover>
                 <div className={`${card} group h-full relative overflow-hidden min-h-[320px]`}>
-                  
-                  {/* Background image — strong & visible */}
                   <div
                     className="absolute inset-0 transition-all duration-500 group-hover:scale-110"
                     style={{
@@ -917,11 +990,7 @@ export default function App() {
                       opacity: 0.55,
                     }}
                   />
-                  
-                  {/* Soft overlay — enough for text, not enough to hide image */}
                   <div className="absolute inset-0 bg-white/55 group-hover:bg-white/50 transition-colors duration-500" />
-
-                  {/* Content */}
                   <div className="relative z-10 p-7 flex flex-col h-full">
                     <div className="text-[#c45c6a] text-3xl mb-4 group-hover:scale-125 transition-transform duration-300">
                       {mark}
