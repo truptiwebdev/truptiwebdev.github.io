@@ -1,29 +1,355 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useState, useEffect } from "react";
+import Scene3D from "./Scene3D";
+import ScrollPanda from "./ScrollPanda";
+import ConnectModal from "./ConnectModal";
+
+/* =====================================================================
+   DATA
+===================================================================== */
+
+const navItems = ["Home", "About", "Skills", "Projects", "Services", "Experience", "Contact"];
+
+const heroStats = [
+  ["2+", "Years Experience"],
+  ["8+", "Months Freelancing"],
+  ["10+", "Happy Clients"],
+];
+
+const aboutStats = [
+  ["2+", "Years Experience"],
+  ["8+", "Months Freelancing"],
+  ["10+", "Happy Clients"],
+  ["20+", "Projects Built"],
+];
+
+const coreTech = ["React", "Laravel", "PHP", "MySQL", "Tailwind CSS", "REST APIs"];
+const trustedTech = ["React.js", "Laravel", "PHP", "MySQL", "Tailwind CSS", "REST APIs", "JavaScript", "Git", "Docker"];
+
+const clientProjects = [
+  {
+    title: "Salon Website",
+    icon: "💇‍♀️",
+    description: "Modern salon website with services, pricing, gallery and appointment-focused design.",
+    problem: "A local salon needed a clear online presence to show services and receive appointment enquiries.",
+    solution: "A responsive site with service and pricing pages, a photo gallery and an enquiry form.",
+    outcome: "Delivered a mobile-friendly website the owner can share with customers.",
+    tech: "React • Tailwind • Responsive UI",
+    image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1600",
+  },
+  {
+    title: "Cafe Website",
+    icon: "☕",
+    description: "Attractive cafe website with menu, location, gallery and customer enquiry features.",
+    problem: "A cafe needed customers to find its menu, location and contact details online.",
+    solution: "A visual menu, location section, gallery and a simple enquiry form.",
+    outcome: "Delivered a clean, fast website that works well on phones.",
+    tech: "React • Tailwind • Responsive UI",
+    image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1600",
+  },
+  {
+    title: "Gym Website",
+    icon: "🏋️",
+    description: "High-energy fitness website with membership plans, programs, trainers and enquiry-focused sections.",
+    problem: "A gym wanted to present its plans and trainers and turn visitors into enquiries.",
+    solution: "Membership plan sections, trainer profiles, programs and a clear enquiry call to action.",
+    outcome: "Delivered an enquiry-focused website for the gym's membership plans.",
+    tech: "React • Tailwind • Responsive UI",
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1600",
+  },
+  {
+    title: "Variety Clothes E-commerce",
+    icon: "👗",
+    description: "Full-stack e-commerce website for a variety clothing brand with product catalog, categories, cart and order management.",
+    problem: "A clothing business needed an online store to showcase variety clothes and manage customer orders.",
+    solution: "Built a complete e-commerce platform with product listing, categories, shopping cart and order flow using Laravel and HTML.",
+    outcome: "Delivered a working full-stack online store for the clothing brand.",
+    tech: "Laravel • PHP • MySQL • HTML • CSS • JavaScript",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1600",
+  },
+];
+
+const conceptProject = {
+  title: "AI SaaS Landing Page",
+  label: "Concept / Demo Project",
+  description: "Modern AI startup landing page with product features, pricing plans, testimonials and responsive UI.",
+  problem: "Startups need high-converting landing pages to present their SaaS products professionally.",
+  tech: "React • Vite • Tailwind • Responsive UI • Vercel",
+  outcome: "A fast modern landing page suitable for SaaS startups and product launches.",
+  image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=1600",
+};
+
+const moreProjects = [
+  {
+    title: "E-commerce Admin Dashboard",
+    description: "Full product management dashboard with order tracking, payments and customer storefront.",
+    problem: "Store owners needed a simple system to manage products and orders.",
+    tech: "React • Laravel • Stripe • MySQL • Tailwind",
+    outcome: "Clear product and order management interface for store owners.",
+    image: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&q=80&w=1600",
+  },
+  {
+    title: "Real-time Collaboration Whiteboard",
+    description: "Live collaborative board with drawing, sticky notes and team rooms.",
+    problem: "Remote teams needed a real-time brainstorming tool.",
+    tech: "React • Laravel Reverb • WebSockets • Canvas API",
+    outcome: "Enabled real-time drawing and notes for remote teams.",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=1600",
+  },
+  {
+    title: "Freelancer CRM & Invoice System",
+    description: "Client management tool with invoicing, proposals and time tracking.",
+    problem: "Freelancers needed a simple system to manage clients and payments.",
+    tech: "React • Laravel • Stripe • Mailgun",
+    outcome: "Simple client, proposal and invoice workflow for freelancers.",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=1600",
+  },
+];
+
+const results = [
+  ["🚚", "Logistics CRM", "Built a CRM dashboard used for daily business operations.", "Business Operations"],
+  ["⚡", "Workflow Automation", "Reduced manual administrative work using automation tools.", "Automation"],
+  ["💳", "SaaS Subscription Platform", "Developed a SaaS platform with subscription and Stripe billing functionality.", "SaaS Development"],
+  ["🔗", "REST API Systems", "Developed secure REST APIs for mobile applications and connected systems.", "Backend Development"],
+  ["🚀", "Database Performance", "Optimized database queries and improved application responsiveness.", "Performance Optimization"],
+  ["📊", "Startup Dashboards", "Delivered scalable dashboards designed around startup and business workflows.", "Dashboard Development"],
+];
+
+const processSteps = [
+  ["01", "💬", "Discovery", "We discuss your idea, requirements, target users, features, timeline, and project goals."],
+  ["02", "⚙️", "Development", "I build the website or application using a clean, scalable, and responsive development approach."],
+  ["03", "🧪", "Testing", "I test functionality, responsiveness, APIs, forms, performance, and important user flows."],
+  ["04", "🚀", "Launch", "After final approval, I deploy the project and make sure everything is ready for real users."],
+];
+
+const services = [
+  ["🌐", "Business Websites", "Professional, responsive websites for businesses, startups, local brands, salons, cafes, gyms, and service providers.", "React • Laravel • Tailwind CSS", "Offer"],
+  ["🚀", "Landing Pages", "High-converting landing pages for products, services, campaigns, portfolios, and marketing purposes.", "Responsive UI • CTA • Performance", "Offer"],
+  ["🔗", "Backend & API Development", "Secure REST APIs, backend logic, database integration, authentication, third-party integrations, and payment systems.", "PHP • Laravel • MySQL • REST APIs", "Offer"],
+  ["🛠️", "Fixes & Performance", "Fix existing website issues, improve slow applications, optimize databases, resolve bugs, and improve overall performance.", "Bug Fixes • Optimization • Database Performance", "Offer"],
+  ["🧰", "Maintenance", "Ongoing support after delivery with defined support hours, response time and included updates.", "Monthly Plan • Add-on", "Add-on"],
+  ["💻", "Custom Web Applications", "Custom dashboards, CRM systems, admin panels, business tools, and web applications built around your workflow.", "React • Laravel • MySQL", "Coming Soon"],
+  ["⚡", "SaaS & MVP Development", "Build and launch MVPs and SaaS products with scalable architecture, authentication, subscriptions, and dashboards.", "React • Laravel • REST APIs • Stripe", "Coming Soon"],
+];
+
+const pricing = [
+  ["Landing page", "₹2,000 – ₹3,000", "Sections, responsiveness, revisions and supplied content agreed up front."],
+  ["Business website", "₹5,000 – ₹10,000", "Page count, forms, integrations, revisions and timeline agreed up front."],
+  ["Backend / API work", "₹5,000 – ₹15,000", "Quoted by endpoints, authentication, integrations, testing and complexity."],
+  ["Maintenance", "₹1,500 – ₹3,000 / month", "Included tasks, response time and extra-work charges defined in writing."],
+];
+
+const skillGroups = [
+  {
+    title: "Frontend Development",
+    description: "Building responsive, modern and user-friendly interfaces that work smoothly across devices.",
+    items: ["React.js", "JavaScript", "HTML5 & CSS3", "Tailwind CSS", "Responsive UI/UX", "Framer Motion"],
+    img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Backend & Database",
+    description: "Developing secure backend systems, APIs and database-driven applications.",
+    items: ["Laravel", "PHP", "RESTful APIs", "MySQL", "PostgreSQL", "Eloquent ORM"],
+    img: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Tools & Delivery",
+    description: "Using modern development and deployment tools to deliver reliable projects efficiently.",
+    items: ["Git & GitHub", "Docker", "Postman", "Jira / Agile", "Vercel", "Railway / Forge"],
+    img: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1000&q=80",
+  },
+];
+
+const clientSkills = ["Responsive Websites", "SaaS Applications", "Dashboards & CRMs", "API Integrations"];
+
+const experience = [
+  {
+    role: "Full Stack Developer",
+    company: "TEMPCON EXPRESS PVT. LTD, Mumbai",
+    tag: "Full Stack",
+    desc: "Built and maintained an internal CRM using React and Laravel. Worked on REST APIs, application performance, database-driven features, and clean full-stack architecture.",
+    skills: ["React", "Laravel", "REST APIs", "MySQL", "Performance"],
+  },
+  {
+    role: "Software Developer",
+    company: "TechExcel Software Solutions, Mumbai",
+    tag: "Client Projects",
+    desc: "Worked on multiple client projects by developing responsive user interfaces, Laravel backends, API integrations, and business-focused web solutions.",
+    skills: ["Laravel", "PHP", "React", "Responsive UI", "Integrations"],
+  },
+  {
+    role: "Software Developer",
+    company: "Loke Infosolutions Pvt Ltd, Mumbai",
+    tag: "Backend & APIs",
+    desc: "Developed secure REST APIs, optimized MySQL databases, and implemented authentication and payment-related functionality for web applications.",
+    skills: ["PHP", "REST APIs", "MySQL", "Authentication", "Payments"],
+  },
+];
+
+const experienceStats = [
+  ["2+", "Years Professional Experience"],
+  ["8+", "Months Freelancing"],
+  ["20+", "Projects Built"],
+];
+
+const whyMe = [
+  ["💼", "Professional Experience", "2+ years of professional development experience working on real-world web applications and business projects."],
+  ["🚀", "Freelance Experience", "8+ months of freelancing experience focused on understanding client requirements and delivering practical solutions."],
+  ["🎯", "Business-Focused", "I build websites and applications with usability, performance, scalability, and business goals in mind."],
+  ["⚡", "Clean & Scalable Code", "Structured code and reusable components make applications easier to maintain, improve, and scale."],
+  ["🤝", "Clear Communication", "Clear communication throughout the project helps keep requirements, progress, and expectations aligned."],
+  ["🔧", "End-to-End Support", "From development and API integration to bug fixing and performance improvements, I can support the complete workflow."],
+];
+
+const testimonials = [
+  [
+    "“",
+    "Trupti built our Variety Clothes online store exactly the way we needed. From product listing to cart and orders — everything works smoothly. She understood our business and delivered on time. Highly recommended.",
+    "Narayan Loke",
+    "Founder, Variety Clothes",
+    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=900",
+  ],
+  [
+    "“",
+    "Our gym website looks professional and clearly shows membership plans, trainers and programs. After launch, we started getting more enquiries. Trupti was patient, clear in communication and delivered exactly what we asked for.",
+    "Vishal Shinde",
+    "Owner, Gym Website",
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=900",
+  ],
+  [
+    "★",
+    "The cafe website is clean, fast on mobile, and our menu and location are easy for customers to find. Customers often mention they found us online. Very happy with the result and the support after delivery.",
+    "Vaibhav Shoshte",
+    "Owner, Cafe Website",
+    "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=900",
+  ],
+];
+
+/* =====================================================================
+   HELPERS
+===================================================================== */
+
+const serif = { fontFamily: "'Cormorant Garamond', Georgia, serif" };
+const sans = { fontFamily: "'DM Sans', system-ui, sans-serif" };
+
+const card =
+  "rounded-2xl border border-stone-200/80 bg-white shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-all duration-300";
+const btnPrimary =
+  "inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#c45c6a] text-white font-medium tracking-wide hover:bg-[#b04e5b] shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c45c6a]";
+const btnGhost =
+  "inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-stone-300 text-stone-700 font-medium hover:bg-stone-50 hover:scale-105 active:scale-95 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400";
+const pill = "px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-stone-600 text-xs md:text-sm";
+
+function Reveal({ children, delay = 0, className = "", hover = false }) {
+  const reduce = useReducedMotion();
+  if (reduce) return <div className={className}>{children}</div>;
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      whileHover={hover ? { y: -4 } : undefined}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function Heading({ eyebrow, title, text }) {
+  return (
+    <Reveal className="text-center mb-16 group">
+      {eyebrow && (
+        <p className="text-[#c45c6a] text-xs font-medium uppercase tracking-[0.28em] mb-4 transition-all duration-300 group-hover:scale-110 group-hover:tracking-[0.32em]">
+          {eyebrow}
+        </p>
+      )}
+      <h2
+        style={serif}
+        className="text-4xl md:text-5xl lg:text-6xl font-semibold text-stone-900 tracking-tight 
+                   transition-all duration-300 cursor-default
+                   group-hover:scale-105 group-hover:text-[#c45c6a]"
+      >
+        {title}
+      </h2>
+      {text && (
+        <p className="text-stone-600 max-w-2xl mx-auto mt-5 leading-relaxed text-[15px] md:text-base transition-all duration-300 group-hover:text-stone-700">
+          {text}
+        </p>
+      )}
+    </Reveal>
+  );
+}
+
+function CtaButton({ href = "#contact", children }) {
+  return (
+    <a href={href} className={btnPrimary}>
+      {children} <span className="opacity-90">→</span>
+    </a>
+  );
+}
+
+function TechPills({ tech }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {tech.split(" • ").map((t) => (
+        <span
+          key={t}
+          className="px-2.5 py-1 rounded-full bg-stone-100 text-stone-600 text-xs border border-stone-200
+                     hover:bg-[#c45c6a]/10 hover:text-[#c45c6a] hover:border-[#c45c6a]/40 hover:scale-105 transition-all duration-200 cursor-default"
+        >
+          {t}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <div>
+      <label className="block text-sm text-stone-600 mb-2">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const inputCls =
+  "w-full p-4 rounded-xl bg-white border border-stone-200 text-stone-800 placeholder-stone-400 outline-none focus:border-[#c45c6a]/60 focus:ring-2 focus:ring-[#c45c6a]/15 transition";
+
+/* =====================================================================
+   PAGE
+===================================================================== */
 
 export default function App() {
   const [pageLoading, setPageLoading] = useState(true);
-  const [formStatus, setFormStatus] = useState("idle"); // idle | sending | success | error
+  const [formStatus, setFormStatus] = useState("idle");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("demo");
+  const reduce = useReducedMotion();
 
   useEffect(() => {
-    const timer = setTimeout(() => setPageLoading(false), 1400);
+    const timer = setTimeout(() => setPageLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
+
+  const openConnectModal = (type = "demo") => {
+    setModalType(type);
+    setModalOpen(true);
+  };
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
     setFormStatus("sending");
-
     const form = e.target;
     const data = new FormData(form);
-
     try {
       const response = await fetch("https://formspree.io/f/xlgwbvjk", {
         method: "POST",
         body: data,
         headers: { Accept: "application/json" },
       });
-
       if (response.ok) {
         setFormStatus("success");
         form.reset();
@@ -35,1839 +361,716 @@ export default function App() {
     }
   };
 
+  const hero = (delay) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 18 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] },
+        };
+
   if (pageLoading) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-black via-red-950 to-black flex flex-col items-center justify-center z-[9999]">
-        <img
-          src="/cutegirl.png"
-          alt="Cute loading character"
-          className="w-48 h-auto md:w-64 rounded-2xl shadow-2xl mb-6 border-4 border-red-500/50 animate-bounce"
-        />
+      <div className="fixed inset-0 bg-white flex flex-col items-center justify-center z-[9999]">
         <motion.p
-          className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-300 via-pink-300 to-red-400 text-transparent bg-clip-text"
-          animate={{ scale: [0.95, 1.05, 0.95] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          style={serif}
+          className="text-2xl md:text-3xl font-medium text-stone-700 tracking-wide"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
-          Loading...
+          Loading
         </motion.p>
       </div>
     );
   }
 
-  const projects = [
-    {
-      title: "AI SaaS Landing Page",
-      description: "Modern AI startup landing page with product features, pricing plans, testimonials and responsive UI.",
-      problem: "Startups need high-converting landing pages to present their SaaS products professionally.",
-      tech: "React • Vite • Tailwind • Responsive UI • Vercel",
-      outcome: "Delivered a fast modern landing page suitable for SaaS startups and product launches",
-      demo: "https://aiwritersaas-landing.vercel.app",
-      github: "https://github.com/truptiwebdev/aiwritersaas-landing",
-      image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=1600",
-    },
-    {
-      title: "SaaS Subscription & Billing Platform",
-      description: "Full SaaS starter platform with Stripe billing, teams, permissions and subscription management.",
-      problem: "Startups needed a ready backend to launch paid SaaS products quickly.",
-      tech: "React • Laravel • Stripe • Tailwind • Vercel",
-      outcome: "Helped founders launch SaaS products 4× faster",
-      demo: "#",
-      github: "#",
-      image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1600",
-    },
-    {
-      title: "E-commerce Admin Dashboard",
-      description: "Full product management dashboard with order tracking, payments and customer storefront.",
-      problem: "Store owners needed a simple system to manage products and orders.",
-      tech: "React • Laravel • Stripe • MySQL • Tailwind",
-      outcome: "Improved store operations efficiency by 45%",
-      demo: "#",
-      github: "#",
-      image: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&q=80&w=1600",
-    },
-    {
-      title: "Real-time Collaboration Whiteboard",
-      description: "Live collaborative board with drawing, sticky notes and team rooms.",
-      problem: "Remote teams needed a real-time brainstorming tool.",
-      tech: "React • Laravel Reverb • WebSockets • Canvas API",
-      outcome: "Enabled seamless remote collaboration",
-      demo: "#",
-      github: "#",
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=1600",
-    },
-    {
-      title: "Smart Personal Finance Tracker",
-      description: "AI-powered budgeting dashboard with spending insights and charts.",
-      problem: "Users struggled to track and understand their expenses.",
-      tech: "React • Laravel • Chart.js • OpenAI",
-      outcome: "Helped users improve financial awareness",
-      demo: "#",
-      github: "#",
-      image: "https://images.unsplash.com/photo-1551288049-b1f4d7c6e0e5?auto=format&fit=crop&q=80&w=1600",
-    },
-    {
-      title: "Freelancer CRM & Invoice System",
-      description: "Client management tool with invoicing, proposals and time tracking.",
-      problem: "Freelancers needed a simple system to manage clients and payments.",
-      tech: "React • Laravel • Stripe • Mailgun",
-      outcome: "Reduced admin work for freelancers by 50%",
-      demo: "#",
-      github: "#",
-      image: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=1600",
-    },
-  ];
-
   return (
-    <div className="relative min-h-screen text-white font-sans overflow-x-hidden bg-black">
+    <div style={sans} className="relative min-h-screen text-stone-800 overflow-x-hidden">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+        html { scroll-behavior: smooth; }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      `}</style>
 
-      {/* Background effects */}
-      <div className="fixed inset-0 -z-20 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-black" />
+      <Scene3D />
+      <ScrollPanda />
 
-        <motion.div
-          className="absolute w-[700px] h-[700px] rounded-full bg-gradient-to-br from-red-600/30 via-pink-600/20 to-transparent blur-3xl"
-          animate={{
-            x: ["-40%", "30%", "-20%", "40%"],
-            y: ["-50%", "40%", "-60%", "30%"],
-            scale: [1, 1.3, 0.9, 1.4],
-          }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-          style={{ top: "-20%", left: "-30%" }}
-        />
-        <motion.div
-          className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-br from-red-500/25 via-purple-500/15 to-transparent blur-3xl"
-          animate={{
-            x: ["30%", "-50%", "20%", "-40%"],
-            y: ["30%", "-40%", "50%", "-30%"],
-            scale: [1, 1.35, 0.85, 1.45],
-          }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut", delay: 8 }}
-          style={{ bottom: "-15%", right: "-25%" }}
-        />
-
-        <div
-          className="absolute inset-0 opacity-20 mix-blend-soft-light"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E")`,
-          }}
-        />
-      </div>
-
-      {/* Navbar */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-xl border border-red-600/30 rounded-full px-6 md:px-8 py-3 flex gap-4 md:gap-6 text-sm md:text-base font-medium z-50 shadow-lg">
-        {["Home", "About", "Skills", "Projects", "Services", "Experience", "Contact"].map((item) => (
-          <motion.a
-            key={item}
-            href={`#${item.toLowerCase()}`}
-            className="relative hover:text-red-300 transition-colors group"
-            whileHover={{ scale: 1.08, y: -2 }}
+      {/* NAVBAR */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200/80">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <a href="#home" className="text-sm font-medium tracking-wide text-stone-900 hover:text-[#c45c6a] hover:scale-110 transition-all duration-300">
+            Trupti Mishra
+          </a>
+          <div className="hidden md:flex items-center gap-1 text-sm text-stone-600">
+            {navItems.map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="relative px-4 py-2 rounded-full font-medium transition-all duration-300
+                           hover:text-[#c45c6a] hover:bg-[#c45c6a]/10 hover:scale-110 hover:shadow-sm active:scale-95"
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+          <a
+            href="#contact"
+            className="text-sm px-5 py-2 rounded-full border border-stone-300 text-stone-700 
+                       hover:bg-[#c45c6a] hover:text-white hover:border-[#c45c6a] 
+                       hover:scale-110 hover:shadow-md transition-all duration-300 active:scale-95"
           >
-            {item}
-            <motion.span
-              className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-red-400 to-pink-400 rounded-full"
-              initial={{ width: 0 }}
-              whileHover={{ width: "100%" }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.a>
-        ))}
+            Hire Me
+          </a>
+        </div>
       </nav>
 
       {/* HERO */}
-      <section
-        id="home"
-        className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 md:pt-20 relative"
-      >
-        {/* Hero Background */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <img
-            src="/tech.png"
-            alt="Futuristic technology background"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Profile Image */}
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9 }}
-          className="relative mb-8 md:mb-10 z-10"
-        >
-          <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-red-500/70 shadow-2xl mx-auto bg-black/40">
+      <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-28 md:pt-24 relative">
+        <motion.div {...hero(0)} className="relative mb-10 z-10">
+          <div className="w-40 h-40 md:w-52 md:h-52 rounded-full overflow-hidden border border-slate-300 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)] mx-auto bg-[#e2e8f0] hover:scale-105 transition-transform duration-500">
             <img
               src="/truptipic.jpeg"
-              alt="Trupti Mishra - Freelance Full-Stack Developer"
-              className="w-full h-full object-contain object-center"
+              alt="Trupti Mishra"
+              className="w-full h-full object-cover object-center"
             />
           </div>
-
-          <motion.div
-            className="absolute inset-0 rounded-full bg-gradient-to-br from-red-500/50 to-pink-600/40 blur-2xl -z-10"
-            animate={{
-              scale: [1, 1.25, 1],
-              opacity: [0.5, 0.9, 0.5],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
         </motion.div>
 
-        {/* Small Intro */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="text-red-300 text-sm md:text-base font-semibold tracking-wider uppercase mb-3 z-10"
-        >
+        <motion.p {...hero(0.08)} className="text-[#c45c6a] text-xs md:text-sm font-medium tracking-[0.25em] uppercase mb-5 z-10 hover:scale-110 hover:tracking-[0.32em] transition-all duration-300 cursor-default">
           Freelance Full-Stack Developer
         </motion.p>
 
-        {/* Main Heading */}
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-5 bg-gradient-to-r from-red-300 via-pink-300 to-red-400 text-transparent bg-clip-text z-10 max-w-5xl"
-        >
-          I Build Modern Websites & Web Applications That Help Businesses Grow
+        <motion.h1 {...hero(0.15)} style={serif} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.15] mb-6 text-stone-900 z-10 max-w-4xl hover:scale-105 hover:text-[#c45c6a] transition-all duration-500 cursor-default">
+          I build websites, booking systems & backend APIs for small businesses
         </motion.h1>
 
-        {/* Supporting Text */}
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-base md:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed z-10"
-        >
-          I’m Trupti Mishra, a full-stack developer with 2+ years of professional
-          experience and 8+ months of freelancing experience. I create responsive
-          business websites, SaaS products, dashboards, and custom web applications
-          tailored to your goals.
+        <motion.p {...hero(0.22)} className="text-base md:text-lg text-stone-700 max-w-2xl mx-auto leading-relaxed z-10">
+          I’m Trupti Mishra. Practical websites, booking systems and Laravel backend work for gyms, salons, cafés and local businesses that need clear, reliable digital solutions.
         </motion.p>
 
-        {/* Services Highlight */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="mt-5 text-sm md:text-base text-gray-300 z-10"
-        >
-          Business Websites • Landing Pages • SaaS • Dashboards • Custom Web Apps
+        <motion.p {...hero(0.28)} className="mt-6 text-sm text-stone-600 z-10">
+          Business Websites · Landing Pages · Backend & APIs · Bug Fixes · Maintenance
         </motion.p>
 
-        {/* Tech Stack */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-3 text-red-300 text-sm md:text-base font-medium z-10"
-        >
-          React • Laravel • MySQL • REST APIs • Tailwind CSS
-        </motion.p>
-
-        {/* Availability */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-5 flex items-center gap-2 text-green-400 text-sm md:text-base font-semibold z-10"
-        >
-          <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
+        <motion.div {...hero(0.34)} className="mt-5 flex items-center gap-2 text-emerald-600 text-sm font-medium z-10">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Available for freelance projects
         </motion.div>
 
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 mt-8 z-10"
-        >
-          <motion.a
-            href="#projects"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="bg-gradient-to-r from-red-600 to-pink-600 px-8 py-3.5 rounded-full font-bold shadow-lg hover:shadow-[0_0_30px_rgba(239,68,68,0.5)] transition-all"
-          >
-            View My Work →
-          </motion.a>
-
-          <motion.a
-            href="#contact"
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="border border-red-400 px-8 py-3.5 rounded-full font-semibold hover:bg-red-600/20 transition-all"
-          >
-            Let's Work Together
-          </motion.a>
+        <motion.div {...hero(0.4)} className="flex flex-col sm:flex-row gap-4 mt-10 z-10">
+          <CtaButton>Start a Project</CtaButton>
+          <a href="#projects" className={btnGhost}>View My Work</a>
         </motion.div>
 
-        {/* Experience Highlight */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="mt-10 flex flex-wrap justify-center gap-6 md:gap-10 text-center z-10"
-        >
-          <div>
-            <p className="text-2xl md:text-3xl font-bold text-white">2+</p>
-            <p className="text-xs md:text-sm text-gray-400">
-              Years Experience
-            </p>
-          </div>
-
-          <div>
-            <p className="text-2xl md:text-3xl font-bold text-white">8+</p>
-            <p className="text-xs md:text-sm text-gray-400">
-              Months Freelancing
-            </p>
-          </div>
-
-          <div>
-            <p className="text-2xl md:text-3xl font-bold text-white">10+</p>
-            <p className="text-xs md:text-sm text-gray-400">
-              Happy Clients
-            </p>
-          </div>
+        <motion.div {...hero(0.48)} className="mt-14 flex flex-wrap justify-center gap-10 md:gap-14 text-center z-10">
+          {heroStats.map(([v, l]) => (
+            <div key={l} className="hover:scale-110 transition-transform duration-300 cursor-default">
+              <p className="text-2xl md:text-3xl font-semibold text-stone-900 hover:text-[#c45c6a] transition-colors">{v}</p>
+              <p className="text-xs text-stone-600 mt-1 tracking-wide">{l}</p>
+            </div>
+          ))}
         </motion.div>
       </section>
-     {/* ABOUT */}
-<section id="about" className="py-20 px-6 max-w-6xl mx-auto">
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.9 }}
-    className="bg-black/50 backdrop-blur-xl border border-red-600/30 p-8 md:p-12 rounded-3xl shadow-2xl relative overflow-hidden"
-  >
-    {/* Background */}
-    <div className="absolute inset-0 opacity-10 pointer-events-none">
-      <img
-        src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1400&q=80"
-        alt=""
-        className="w-full h-full object-cover"
-      />
-    </div>
 
-    <div className="relative z-10">
-      {/* Heading */}
-      <div className="text-center mb-8">
-        <p className="text-red-300 text-sm font-semibold uppercase tracking-widest mb-2">
-          About Me
-        </p>
-
-        <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-red-300 to-pink-300 text-transparent bg-clip-text">
-          Turning Ideas Into Digital Experiences
-        </h2>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto text-center">
-        <p className="text-base md:text-lg text-gray-200 leading-relaxed">
-          I’m Trupti Mishra, a Full-Stack Developer with{" "}
-          <span className="text-red-300 font-semibold">
-            2+ years of professional experience
-          </span>{" "}
-          and{" "}
-          <span className="text-red-300 font-semibold">
-            8+ months of freelancing experience
-          </span>
-          .
-        </p>
-
-        <p className="mt-5 text-base md:text-lg text-gray-300 leading-relaxed">
-          I build modern, responsive and user-friendly websites and web
-          applications for businesses, startups and entrepreneurs. From
-          business websites and landing pages to SaaS platforms, dashboards,
-          CRMs and custom web applications, I focus on creating solutions that
-          are reliable, scalable and easy to use.
-        </p>
-
-        <p className="mt-5 text-base md:text-lg text-gray-300 leading-relaxed">
-          My goal is simple — understand your business, turn your idea into a
-          professional digital product, and deliver a website or application
-          that helps you achieve your goals.
-        </p>
-      </div>
-
-      {/* Highlights */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-        {[
-          {
-            title: "2+",
-            text: "Years Experience",
-          },
-          {
-            title: "8+",
-            text: "Months Freelancing",
-          },
-          {
-            title: "10+",
-            text: "Happy Clients",
-          },
-          {
-            title: "20+",
-            text: "Projects Built",
-          },
-        ].map((item, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="bg-black/50 border border-red-500/20 rounded-2xl p-5 text-center hover:border-red-400/50 transition-all"
-          >
-            <p className="text-2xl md:text-3xl font-bold text-red-300">
-              {item.title}
-            </p>
-
-            <p className="text-sm text-gray-400 mt-1">
-              {item.text}
-            </p>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Tech Stack */}
-      <div className="mt-10 text-center">
-        <p className="text-sm text-gray-400 mb-3">
-          Core Technologies
-        </p>
-
-        <div className="flex flex-wrap justify-center gap-2">
-          {[
-            "React",
-            "Laravel",
-            "PHP",
-            "MySQL",
-            "Tailwind CSS",
-            "REST APIs",
-          ].map((tech) => (
-            <span
-              key={tech}
-              className="px-4 py-2 rounded-full bg-red-950/50 border border-red-700/30 text-red-300 text-sm"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  </motion.div>
-</section>
-
-{/* TRUSTED TECH */}
-<section className="py-16 px-6 text-center relative">
-  <motion.div
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.8 }}
-    className="max-w-5xl mx-auto"
-  >
-    <p className="text-red-300 text-sm font-semibold uppercase tracking-widest mb-3">
-      Technologies I Work With
-    </p>
-
-    <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-red-300 to-pink-300 text-transparent bg-clip-text">
-      Built With Modern Technology
-    </h2>
-
-    <p className="text-gray-400 max-w-2xl mx-auto mb-8 text-sm md:text-base">
-      I use reliable and modern technologies to build responsive websites,
-      scalable web applications, dashboards and custom digital solutions.
-    </p>
-
-    <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-      {[
-        "React.js",
-        "Laravel",
-        "PHP",
-        "MySQL",
-        "Tailwind CSS",
-        "REST APIs",
-        "JavaScript",
-        "Git",
-        "Docker",
-      ].map((tech, index) => (
-        <motion.span
-          key={tech}
-          initial={{ opacity: 0, scale: 0.85 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: index * 0.05 }}
-          whileHover={{ y: -3, scale: 1.05 }}
-          className="px-5 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-red-500/20 text-gray-200 text-sm md:text-base font-medium hover:border-red-400/60 hover:text-red-300 transition-all shadow-lg"
-        >
-          {tech}
-        </motion.span>
-      ))}
-    </div>
-  </motion.div>
-</section>
-
-{/* SKILLS */}
-<section id="skills" className="py-20 px-6 bg-black/30 backdrop-blur-sm">
-  <div className="max-w-6xl mx-auto">
-
-    {/* Section Heading */}
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className="text-center mb-12"
-    >
-      <p className="text-red-300 text-sm font-semibold uppercase tracking-widest mb-3">
-        My Expertise
-      </p>
-
-      <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-red-300 to-pink-300 text-transparent bg-clip-text mb-4">
-        Skills & Expertise
-      </h2>
-
-      <p className="text-gray-400 max-w-2xl mx-auto text-sm md:text-base">
-        From frontend experiences to backend systems, I build complete,
-        reliable and scalable digital solutions.
-      </p>
-    </motion.div>
-
-    {/* Skill Cards */}
-    <div className="grid md:grid-cols-3 gap-6">
-      {[
-        {
-          title: "Frontend Development",
-          description:
-            "Building responsive, modern and user-friendly interfaces that work smoothly across devices.",
-          items: [
-            "React.js",
-            "JavaScript",
-            "HTML5 & CSS3",
-            "Tailwind CSS",
-            "Responsive UI/UX",
-            "Framer Motion",
-          ],
-          img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1000&q=80",
-        },
-        {
-          title: "Backend & Database",
-          description:
-            "Developing secure backend systems, APIs and database-driven applications.",
-          items: [
-            "Laravel",
-            "PHP",
-            "RESTful APIs",
-            "MySQL",
-            "PostgreSQL",
-            "Eloquent ORM",
-          ],
-          img: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1000&q=80",
-        },
-        {
-          title: "Tools & Delivery",
-          description:
-            "Using modern development and deployment tools to deliver reliable projects efficiently.",
-          items: [
-            "Git & GitHub",
-            "Docker",
-            "Postman",
-            "Jira / Agile",
-            "Vercel",
-            "Railway / Forge",
-          ],
-          img: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1000&q=80",
-        },
-      ].map((group, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: i * 0.1 }}
-          whileHover={{ y: -8 }}
-          className="bg-black/50 backdrop-blur-xl rounded-3xl border border-red-600/20 hover:border-red-500/50 transition-all overflow-hidden shadow-2xl"
-        >
-          {/* Image */}
-          <div className="relative h-44 overflow-hidden">
-            <img
-              src={group.img}
-              alt={`${group.title} development`}
-              className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            <h3 className="text-xl font-bold mb-3 text-red-300">
-              {group.title}
-            </h3>
-
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
-              {group.description}
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              {group.items.map((item) => (
-                <span
-                  key={item}
-                  className="px-3 py-1.5 rounded-full bg-red-950/50 border border-red-700/30 text-red-200 text-xs md:text-sm"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-
-    {/* Client-Focused Skills */}
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, delay: 0.2 }}
-      className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4"
-    >
-      {[
-        "Responsive Websites",
-        "SaaS Applications",
-        "Dashboards & CRMs",
-        "API Integrations",
-      ].map((item) => (
-        <div
-          key={item}
-          className="bg-black/40 border border-red-500/20 rounded-2xl p-4 text-center hover:border-red-400/50 transition-all"
-        >
-          <p className="text-gray-200 text-sm font-medium">
-            ✓ {item}
-          </p>
-        </div>
-      ))}
-    </motion.div>
-
-  </div>
-</section>
-
-{/* PROJECTS */}
-<section id="projects" className="py-20 px-6 relative">
-  <div className="absolute inset-0 pointer-events-none">
-    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-red-950/10 to-black" />
-  </div>
-
-  <div className="max-w-7xl mx-auto relative z-10">
-
-    {/* Heading */}
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className="text-center mb-14"
-    >
-      <p className="text-red-300 text-sm font-semibold uppercase tracking-widest mb-3">
-        Selected Work
-      </p>
-
-      <h2 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-red-400 via-pink-500 to-red-400 bg-clip-text text-transparent mb-5">
-        Projects I’ve Built
-      </h2>
-
-      <p className="text-base md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-        A selection of web applications, SaaS products, dashboards and
-        business solutions I’ve designed and developed.
-      </p>
-    </motion.div>
-
-    {/* Project Grid */}
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
-      {projects.map((project, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, delay: index * 0.08 }}
-          whileHover={{ y: -8 }}
-          className="group relative bg-black/65 backdrop-blur-xl rounded-3xl border border-red-700/30 hover:border-red-500/70 overflow-hidden shadow-2xl transition-all duration-300"
-        >
-
-          {/* Top Accent */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-pink-600 to-red-600" />
-
-          {/* Project Image */}
-          <div className="relative h-56 overflow-hidden">
-            <img
-              src={project.image}
-              alt={`${project.title} project preview`}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-            {/* Project Number */}
-            <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-red-500/30 text-red-300 text-xs font-semibold">
-              0{index + 1}
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-
-            <h3 className="text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-red-300 transition-colors">
-              {project.title}
-            </h3>
-
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
-              {project.description}
-            </p>
-
-            {/* Problem */}
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-wide text-red-300 font-semibold mb-1">
-                Problem
-              </p>
-
-              <p className="text-gray-300 text-sm leading-relaxed">
-                {project.problem}
-              </p>
-            </div>
-
-            {/* Outcome */}
-            <div className="mb-5">
-              <p className="text-xs uppercase tracking-wide text-green-400 font-semibold mb-1">
-                Outcome
-              </p>
-
-              <p className="text-gray-300 text-sm leading-relaxed">
-                {project.outcome}
-              </p>
-            </div>
-
-            {/* Tech */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {project.tech.split(" • ").map((tech, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 rounded-full bg-red-950/60 text-red-300 text-xs border border-red-800/40"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-
-            {/* Links */}
-            <div className="flex items-center justify-between gap-3 pt-4 border-t border-red-900/30">
-
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-semibold text-red-300 hover:text-red-200 transition-colors"
-              >
-                Live Demo →
-              </a>
-
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-semibold text-gray-300 hover:text-white transition-colors"
-              >
-                GitHub →
-              </a>
-            </div>
-
-          </div>
-        </motion.div>
-      ))}
-    </div>
-
-    {/* Small Business Projects */}
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className="mt-16"
-    >
-      <div className="text-center mb-8">
-        <p className="text-red-300 text-sm font-semibold uppercase tracking-widest mb-2">
-          Business Websites
-        </p>
-
-        <h3 className="text-2xl md:text-3xl font-bold text-white">
-          Websites for Growing Businesses
-        </h3>
-
-        <p className="text-gray-400 text-sm md:text-base mt-2 max-w-2xl mx-auto">
-          I also create modern, mobile-friendly websites for businesses and
-          personal brands.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-5">
-
-        {/* Salon */}
-        <motion.div
-          whileHover={{ y: -6 }}
-          className="bg-black/50 border border-red-500/20 rounded-2xl p-6 text-center hover:border-red-400/50 transition-all"
-        >
-          <div className="text-4xl mb-4">💇‍♀️</div>
-
-          <h4 className="text-xl font-bold text-white mb-2">
-            Salon Website
-          </h4>
-
-          <p className="text-gray-400 text-sm leading-relaxed">
-            Modern salon website with services, pricing, gallery and
-            appointment-focused design.
-          </p>
-
-          <p className="mt-4 text-red-300 text-xs font-semibold">
-            Business Website
-          </p>
-        </motion.div>
-
-        {/* Cafe */}
-        <motion.div
-          whileHover={{ y: -6 }}
-          className="bg-black/50 border border-red-500/20 rounded-2xl p-6 text-center hover:border-red-400/50 transition-all"
-        >
-          <div className="text-4xl mb-4">☕</div>
-
-          <h4 className="text-xl font-bold text-white mb-2">
-            Cafe Website
-          </h4>
-
-          <p className="text-gray-400 text-sm leading-relaxed">
-            Attractive cafe website with menu, location, gallery and
-            customer enquiry features.
-          </p>
-
-          <p className="mt-4 text-red-300 text-xs font-semibold">
-            Business Website
-          </p>
-        </motion.div>
-
-        {/* Gym */}
-        <motion.div
-          whileHover={{ y: -6 }}
-          className="bg-black/50 border border-red-500/20 rounded-2xl p-6 text-center hover:border-red-400/50 transition-all"
-        >
-          <div className="text-4xl mb-4">🏋️</div>
-
-          <h4 className="text-xl font-bold text-white mb-2">
-            Gym Website
-          </h4>
-
-          <p className="text-gray-400 text-sm leading-relaxed">
-            High-energy fitness website with membership plans, programs,
-            trainers and enquiry-focused sections.
-          </p>
-
-          <p className="mt-4 text-red-300 text-xs font-semibold">
-            Business Website
-          </p>
-        </motion.div>
-
-      </div>
-    </motion.div>
-
-    {/* CTA */}
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-      className="text-center mt-16"
-    >
-      <p className="text-lg md:text-xl text-gray-200 mb-6">
-        Have a project in mind?
-      </p>
-
-      <a
-        href="#contact"
-        className="inline-block bg-gradient-to-r from-red-600 to-pink-600 px-9 py-4 rounded-full font-bold shadow-xl hover:shadow-[0_0_40px_rgba(239,68,68,0.5)] transition-all hover:-translate-y-1"
-      >
-        Start Your Project →
-      </a>
-    </motion.div>
-
-  </div>
-</section>
-
-{/* CLIENT RESULTS */}
-<section
-  id="results"
-  className="max-w-7xl mx-auto px-6 py-24 relative"
->
-  <div className="text-center mb-14">
-    <p className="text-sm uppercase tracking-[0.3em] text-pink-400 font-semibold mb-3">
-      Proven Work
-    </p>
-
-    <h2 className="text-4xl md:text-5xl font-bold text-white">
-      Results That Matter
-    </h2>
-
-    <p className="text-gray-400 max-w-2xl mx-auto mt-5 leading-relaxed">
-      I focus on building reliable digital solutions that improve business
-      workflows, performance, and day-to-day operations — not just writing code.
-    </p>
-  </div>
-
-  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {[
-      {
-        icon: "🚚",
-        title: "Logistics CRM",
-        result: "Built a CRM dashboard used for daily business operations.",
-        type: "Business Operations",
-      },
-      {
-        icon: "⚡",
-        title: "Workflow Automation",
-        result: "Reduced manual administrative work by 50% using automation tools.",
-        type: "Automation",
-      },
-      {
-        icon: "💳",
-        title: "SaaS Subscription Platform",
-        result: "Developed a SaaS platform with subscription and Stripe billing functionality.",
-        type: "SaaS Development",
-      },
-      {
-        icon: "🔗",
-        title: "REST API Systems",
-        result: "Developed secure REST APIs for mobile applications and connected systems.",
-        type: "Backend Development",
-      },
-      {
-        icon: "🚀",
-        title: "Database Performance",
-        result: "Optimized database queries and improved application speed by 40%.",
-        type: "Performance Optimization",
-      },
-      {
-        icon: "📊",
-        title: "Startup Dashboards",
-        result: "Delivered scalable dashboards designed around startup and business workflows.",
-        type: "Dashboard Development",
-      },
-    ].map((item, index) => (
-      <motion.div
-        key={index}
-        initial={{ opacity: 0, y: 25 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.45, delay: index * 0.05 }}
-        className="group rounded-2xl border border-white/10 bg-white/[0.03] p-7 hover:bg-white/[0.06] hover:border-pink-500/30 transition-all duration-300"
-      >
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <div className="text-3xl">
-            {item.icon}
-          </div>
-
-          <span className="text-xs px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-300">
-            {item.type}
-          </span>
-        </div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          {item.title}
-        </h3>
-
-        <p className="text-gray-400 leading-relaxed">
-          {item.result}
-        </p>
-
-        <div className="mt-6 h-px bg-white/10 group-hover:bg-pink-500/30 transition-colors" />
-
-        <p className="text-sm text-gray-500 mt-4">
-          Real-world development & delivery
-        </p>
-      </motion.div>
-    ))}
-  </div>
-
-  <div className="mt-14 text-center">
-    <p className="text-gray-400 mb-5">
-      Have a similar business challenge?
-    </p>
-
-    <a
-      href="#contact"
-      className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold hover:scale-105 transition-transform"
-    >
-      Let’s Discuss Your Project
-      <span>→</span>
-    </a>
-  </div>
-</section>
-
-     {/* DEVELOPMENT PROCESS */}
-<section
-  id="process"
-  className="max-w-7xl mx-auto px-6 py-24 relative"
->
-  <div className="text-center mb-14">
-    <p className="text-sm uppercase tracking-[0.3em] text-pink-400 font-semibold mb-3">
-      Simple & Transparent
-    </p>
-
-    <h2 className="text-4xl md:text-5xl font-bold text-white">
-      How I Work With Clients
-    </h2>
-
-    <p className="text-gray-400 max-w-2xl mx-auto mt-5 leading-relaxed">
-      A clear development process keeps your project organized, predictable,
-      and focused on the final business goal.
-    </p>
-  </div>
-
-  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-    {[
-      {
-        number: "01",
-        icon: "💬",
-        title: "Discovery",
-        description:
-          "We discuss your idea, requirements, target users, features, timeline, and project goals.",
-      },
-      {
-        number: "02",
-        icon: "⚙️",
-        title: "Development",
-        description:
-          "I build the website or application using a clean, scalable, and responsive development approach.",
-      },
-      {
-        number: "03",
-        icon: "🧪",
-        title: "Testing",
-        description:
-          "I test functionality, responsiveness, APIs, forms, performance, and important user flows.",
-      },
-      {
-        number: "04",
-        icon: "🚀",
-        title: "Launch",
-        description:
-          "After final approval, I deploy the project and make sure everything is ready for real users.",
-      },
-    ].map((step, index) => (
-      <motion.div
-        key={index}
-        initial={{ opacity: 0, y: 25 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.45, delay: index * 0.08 }}
-        className="relative group rounded-2xl border border-white/10 bg-white/[0.03] p-7 hover:bg-white/[0.06] hover:border-pink-500/30 transition-all duration-300"
-      >
-        <div className="flex items-center justify-between mb-7">
-          <div className="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-2xl">
-            {step.icon}
-          </div>
-
-          <span className="text-4xl font-bold text-white/10 group-hover:text-pink-500/20 transition-colors">
-            {step.number}
-          </span>
-        </div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          {step.title}
-        </h3>
-
-        <p className="text-gray-400 leading-relaxed text-sm">
-          {step.description}
-        </p>
-      </motion.div>
-    ))}
-  </div>
-
-  <div className="mt-14 rounded-2xl border border-pink-500/20 bg-gradient-to-r from-pink-500/10 to-red-500/5 p-7 md:p-8 text-center">
-    <h3 className="text-2xl font-semibold text-white mb-3">
-      Have an idea? Let’s turn it into a working product.
-    </h3>
-
-    <p className="text-gray-400 max-w-2xl mx-auto mb-6">
-      Share your requirements and I’ll help you choose the right approach,
-      features, and technology for your project.
-    </p>
-
-    <a
-      href="#contact"
-      className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold hover:scale-105 transition-transform"
-    >
-      Start a Conversation
-      <span>→</span>
-    </a>
-  </div>
-</section>
-{/* SERVICES */}
-<section id="services" className="py-20 px-6">
-  <div className="max-w-6xl mx-auto">
-
-    <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-      Services I Offer
-    </h2>
-
-    <p className="text-center text-gray-400 max-w-2xl mx-auto mb-12">
-      Practical, scalable web solutions designed to help businesses launch,
-      improve, and grow online.
-    </p>
-
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-      {/* Business Websites */}
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition">
-        <div className="text-3xl mb-4">🌐</div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          Business Websites
-        </h3>
-
-        <p className="text-gray-400 text-sm leading-6 mb-4">
-          Professional, responsive websites for businesses, startups,
-          local brands, salons, cafes, gyms, and service providers.
-        </p>
-
-        <p className="text-cyan-400 text-sm">
-          React • Laravel • Tailwind CSS
-        </p>
-      </div>
-
-      {/* Landing Pages */}
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition">
-        <div className="text-3xl mb-4">🚀</div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          Landing Pages
-        </h3>
-
-        <p className="text-gray-400 text-sm leading-6 mb-4">
-          High-converting landing pages for products, services,
-          campaigns, portfolios, and marketing purposes.
-        </p>
-
-        <p className="text-cyan-400 text-sm">
-          Responsive UI • CTA • Performance
-        </p>
-      </div>
-
-      {/* Custom Web Applications */}
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition">
-        <div className="text-3xl mb-4">💻</div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          Custom Web Applications
-        </h3>
-
-        <p className="text-gray-400 text-sm leading-6 mb-4">
-          Custom dashboards, CRM systems, admin panels, business tools,
-          and web applications built around your workflow.
-        </p>
-
-        <p className="text-cyan-400 text-sm">
-          React • Laravel • MySQL
-        </p>
-      </div>
-
-      {/* SaaS & MVP */}
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition">
-        <div className="text-3xl mb-4">⚡</div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          SaaS & MVP Development
-        </h3>
-
-        <p className="text-gray-400 text-sm leading-6 mb-4">
-          Build and launch MVPs and SaaS products with scalable
-          architecture, authentication, subscriptions, and dashboards.
-        </p>
-
-        <p className="text-cyan-400 text-sm">
-          React • Laravel • REST APIs • Stripe
-        </p>
-      </div>
-
-      {/* Backend & APIs */}
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition">
-        <div className="text-3xl mb-4">🔗</div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          Backend & API Development
-        </h3>
-
-        <p className="text-gray-400 text-sm leading-6 mb-4">
-          Secure REST APIs, backend logic, database integration,
-          authentication, third-party integrations, and payment systems.
-        </p>
-
-        <p className="text-cyan-400 text-sm">
-          PHP • Laravel • MySQL • REST APIs
-        </p>
-      </div>
-
-      {/* Fixes & Performance */}
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition">
-        <div className="text-3xl mb-4">🛠️</div>
-
-        <h3 className="text-xl font-semibold text-white mb-3">
-          Fixes & Performance
-        </h3>
-
-        <p className="text-gray-400 text-sm leading-6 mb-4">
-          Fix existing website issues, improve slow applications,
-          optimize databases, resolve bugs, and improve overall performance.
-        </p>
-
-        <p className="text-cyan-400 text-sm">
-          Bug Fixes • Optimization • Database Performance
-        </p>
-      </div>
-
-    </div>
-
-    {/* CTA */}
-    <div className="text-center mt-12">
-      <p className="text-gray-400 mb-5">
-        Have a project in mind? Let's build something that works for your business.
-      </p>
-
-      <a
-        href="#contact"
-        className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:scale-105 transition"
-      >
-        Let's Work Together
-        <span>→</span>
-      </a>
-    </div>
-
-  </div>
-</section>
-
-     {/* EXPERIENCE */}
-<section
-  id="experience"
-  className="max-w-7xl mx-auto px-6 py-24 relative"
->
-  <div className="text-center mb-14">
-    <p className="text-sm uppercase tracking-[0.3em] text-pink-400 font-semibold mb-3">
-      My Background
-    </p>
-
-    <h2 className="text-4xl md:text-5xl font-bold text-white">
-      Professional Experience
-    </h2>
-
-    <p className="text-gray-400 max-w-2xl mx-auto mt-5 leading-relaxed">
-      Professional experience building full-stack applications, business
-      systems, APIs, dashboards, and scalable web solutions.
-    </p>
-  </div>
-
-  <div className="relative">
-    {/* Timeline Line */}
-    <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-pink-500/50 via-red-500/30 to-transparent" />
-
-    <div className="space-y-8">
-      {[
-        {
-          year: "Professional Experience",
-          role: "Full Stack Developer",
-          company: "TEMPCON EXPRESS PVT. LTD, Mumbai",
-          desc:
-            "Built and maintained an internal CRM using React and Laravel. Worked on REST APIs, application performance, database-driven features, and clean full-stack architecture.",
-          skills: ["React", "Laravel", "REST APIs", "MySQL", "Performance"],
-        },
-        {
-          year: "Professional Experience",
-          role: "Software Developer",
-          company: "TechExcel Software Solutions, Mumbai",
-          desc:
-            "Worked on multiple client projects by developing responsive user interfaces, Laravel backends, API integrations, and business-focused web solutions.",
-          skills: ["Laravel", "PHP", "React", "Responsive UI", "Integrations"],
-        },
-        {
-          year: "Professional Experience",
-          role: "Software Developer",
-          company: "Loke Infosolutions Pvt Ltd, Mumbai",
-          desc:
-            "Developed secure REST APIs, optimized MySQL databases, and implemented authentication and payment-related functionality for web applications.",
-          skills: ["PHP", "REST APIs", "MySQL", "Authentication", "Payments"],
-        },
-      ].map((exp, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: i * 0.1 }}
-          className={`relative md:w-[calc(50%-32px)] ${
-            i % 2 === 0 ? "md:mr-auto" : "md:ml-auto"
-          }`}
-        >
-          {/* Timeline Dot */}
-          <div
-            className={`hidden md:block absolute top-8 w-4 h-4 rounded-full bg-pink-500 border-4 border-[#080808] shadow-[0_0_20px_rgba(236,72,153,0.5)] ${
-              i % 2 === 0 ? "-right-[41px]" : "-left-[41px]"
-            }`}
+      {/* PROJECTS */}
+      <section id="projects" className="py-28 px-6 border-t border-stone-100 relative">
+        <div className="max-w-6xl mx-auto">
+          <Heading
+            eyebrow="Selected Work"
+            title="Projects I’ve Built"
+            text="Real business websites first, each with the problem, the solution and the result."
           />
 
-          <div className="group rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-7 hover:bg-white/[0.06] hover:border-pink-500/30 transition-all duration-300">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-              <span className="text-xs uppercase tracking-wider text-pink-400 font-semibold">
-                {exp.year}
-              </span>
+          <div className="space-y-16">
+            {clientProjects.map((p, i) => (
+              <Reveal key={p.title}>
+                <article className={`${card} overflow-hidden grid md:grid-cols-2`}>
+                  <div className={`relative h-64 md:h-auto min-h-[280px] overflow-hidden ${i % 2 === 1 ? "md:order-2" : ""}`}>
+                    <img src={p.image} alt={`${p.title} preview`} className="w-full h-full object-cover" />
+                    <span className="absolute top-5 left-5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-sm border border-stone-200 text-stone-600 text-xs tracking-wide shadow-sm">
+                      Client Project 0{i + 1}
+                    </span>
+                  </div>
+                  <div className="p-8 md:p-10 flex flex-col justify-center">
+                    <div className="text-3xl mb-4">{p.icon}</div>
+                    <h3 style={serif} className="text-2xl md:text-3xl font-semibold mb-3 text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default origin-left">
+                      {p.title}
+                    </h3>
+                    <p className="text-stone-700 text-sm leading-relaxed mb-6">{p.description}</p>
+                    {[
+                      ["Problem", p.problem],
+                      ["Solution", p.solution],
+                      ["Result", p.outcome],
+                    ].map(([label, val]) => (
+                      <div key={label} className="mb-4">
+                        <p className="text-[11px] uppercase tracking-[0.15em] text-stone-500 mb-1">{label}</p>
+                        <p className="text-stone-700 text-sm leading-relaxed">{val}</p>
+                      </div>
+                    ))}
+                    <div className="mt-4 mb-5">
+                      <TechPills tech={p.tech} />
+                    </div>
+                    <button onClick={() => openConnectModal("demo")} className="text-sm text-[#c45c6a] hover:text-[#b04e5b] hover:scale-105 transition-all text-left">
+                      Live Demo →
+                    </button>
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
 
-              <span className="text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-gray-400">
-                {i === 0
-                  ? "Full Stack"
-                  : i === 1
-                  ? "Client Projects"
-                  : "Backend & APIs"}
-              </span>
-            </div>
-
-            <h3 className="text-2xl font-bold text-white mb-2">
-              {exp.role}
-            </h3>
-
-            <p className="text-pink-300 font-medium mb-4">
-              {exp.company}
-            </p>
-
-            <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              {exp.desc}
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              {exp.skills.map((skill, skillIndex) => (
-                <span
-                  key={skillIndex}
-                  className="text-xs px-3 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-gray-300"
-                >
-                  {skill}
+          {/* Concept project */}
+          <Reveal className="mt-16">
+            <article className={`${card} overflow-hidden grid md:grid-cols-2`}>
+              <div className="relative h-64 md:h-auto min-h-[280px] overflow-hidden">
+                <img src={conceptProject.image} alt={`${conceptProject.title} preview`} className="w-full h-full object-cover" />
+                <span className="absolute top-5 left-5 px-3 py-1 rounded-full bg-white/90 border border-[#c45c6a]/30 text-[#c45c6a] text-xs tracking-wide shadow-sm">
+                  {conceptProject.label}
                 </span>
+              </div>
+              <div className="p-8 md:p-10 flex flex-col justify-center">
+                <h3 style={serif} className="text-2xl md:text-3xl font-semibold mb-3 text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default origin-left">
+                  {conceptProject.title}
+                </h3>
+                <p className="text-stone-700 text-sm leading-relaxed mb-6">{conceptProject.description}</p>
+                <div className="mb-4">
+                  <p className="text-[11px] uppercase tracking-[0.15em] text-stone-500 mb-1">Problem</p>
+                  <p className="text-stone-700 text-sm">{conceptProject.problem}</p>
+                </div>
+                <div className="mb-5">
+                  <p className="text-[11px] uppercase tracking-[0.15em] text-stone-500 mb-1">Outcome</p>
+                  <p className="text-stone-700 text-sm">{conceptProject.outcome}</p>
+                </div>
+                <div className="mb-6">
+                  <TechPills tech={conceptProject.tech} />
+                </div>
+                <div className="flex gap-6 pt-4 border-t border-stone-100">
+                  <button onClick={() => openConnectModal("demo")} className="text-sm text-[#c45c6a] hover:text-[#b04e5b] hover:scale-105 transition-all">
+                    Live Demo →
+                  </button>
+                  <button onClick={() => openConnectModal("github")} className="text-sm text-stone-600 hover:text-stone-900 hover:scale-105 transition-all">
+                    GitHub →
+                  </button>
+                </div>
+              </div>
+            </article>
+          </Reveal>
+
+          {/* Additional Projects */}
+          <div className="mt-28">
+            <Heading
+              eyebrow="More Builds"
+              title="Additional Projects"
+              text="Full-stack applications and product concepts."
+            />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {moreProjects.map((p, index) => (
+                <Reveal key={p.title} delay={index * 0.05} hover>
+                  <article className={`${card} group relative h-full overflow-hidden`}>
+                    <div className="relative h-48 overflow-hidden">
+                      <img src={p.image} alt={`${p.title} project preview`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                      <span className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-white/90 border border-stone-200 text-stone-600 text-xs shadow-sm">
+                        0{index + 1}
+                      </span>
+                    </div>
+                    <div className="p-6">
+                      <h3 style={serif} className="text-xl font-semibold mb-3 text-stone-900 group-hover:text-[#c45c6a] group-hover:scale-105 transition-all duration-300 origin-left">
+                        {p.title}
+                      </h3>
+                      <p className="text-stone-700 text-sm leading-relaxed mb-5">{p.description}</p>
+                      <div className="mb-4">
+                        <p className="text-[11px] uppercase tracking-[0.12em] text-stone-500 mb-1">Problem</p>
+                        <p className="text-stone-700 text-sm leading-relaxed">{p.problem}</p>
+                      </div>
+                      <div className="mb-5">
+                        <p className="text-[11px] uppercase tracking-[0.12em] text-stone-500 mb-1">Outcome</p>
+                        <p className="text-stone-700 text-sm leading-relaxed">{p.outcome}</p>
+                      </div>
+                      <div className="mb-5">
+                        <TechPills tech={p.tech} />
+                      </div>
+                      <div className="flex items-center justify-between gap-3 pt-4 border-t border-stone-100">
+                        <button onClick={() => openConnectModal("demo")} className="text-sm text-[#c45c6a] hover:text-[#b04e5b] hover:scale-105 transition-all">
+                          Live Demo →
+                        </button>
+                        <button onClick={() => openConnectModal("github")} className="text-sm text-stone-600 hover:text-stone-900 hover:scale-105 transition-all">
+                          GitHub →
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </div>
-        </motion.div>
-      ))}
-    </div>
-  </div>
 
-  {/* Experience Summary */}
-  <div className="mt-16 grid sm:grid-cols-3 gap-5">
-    {[
-      {
-        value: "2+",
-        label: "Years Professional Experience",
-      },
-      {
-        value: "8+",
-        label: "Months Freelancing",
-      },
-      {
-        value: "20+",
-        label: "Projects Built",
-      },
-    ].map((stat, index) => (
-      <motion.div
-        key={index}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, delay: index * 0.1 }}
-        className="text-center rounded-2xl border border-white/10 bg-white/[0.03] p-6"
-      >
-        <div className="text-3xl font-bold text-white mb-2">
-          {stat.value}
+          <Reveal className="text-center mt-20">
+            <p className="text-stone-600 mb-6">Have a project in mind?</p>
+            <CtaButton>Start Your Project</CtaButton>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* RESULTS */}
+      <section id="results" className="max-w-6xl mx-auto px-6 py-28 border-t border-stone-100 relative">
+        <Heading
+          eyebrow="Proven Work"
+          title="Results That Matter"
+          text="I focus on building reliable digital solutions that improve business workflows, performance, and day-to-day operations."
+        />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {results.map(([icon, title, result, type], i) => (
+            <Reveal key={title} delay={i * 0.04}>
+              <div className={`${card} group h-full p-7`}>
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="text-2xl group-hover:scale-125 transition-transform duration-300">{icon}</div>
+                  <span className="text-[11px] px-2.5 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-600">{type}</span>
+                </div>
+                <h3 className="text-lg font-medium mb-3 text-stone-900 group-hover:text-[#c45c6a] group-hover:scale-105 transition-all duration-300 origin-left">{title}</h3>
+                <p className="text-stone-700 text-sm leading-relaxed">{result}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal className="mt-14 text-center">
+          <p className="text-stone-600 mb-5">Have a similar business challenge?</p>
+          <CtaButton>Let’s Discuss Your Project</CtaButton>
+        </Reveal>
+      </section>
+
+      {/* SERVICES + PRICING */}
+      <section id="services" className="max-w-6xl mx-auto px-6 py-28 border-t border-stone-100 relative">
+        <Heading
+          eyebrow="What I Offer"
+          title="Services I Offer"
+          text="Practical, clearly scoped work designed to help businesses launch, improve and grow online."
+        />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {services.map(([icon, title, text, tech, status], i) => (
+            <Reveal key={title} delay={i * 0.03}>
+              <div className={`${card} h-full p-6 group`}>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="text-2xl group-hover:scale-125 transition-transform duration-300">{icon}</div>
+                  {status !== "Offer" && (
+                    <span className="text-[11px] px-2.5 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-600">{status}</span>
+                  )}
+                </div>
+                <h3 className="text-lg font-medium mb-3 text-stone-900 group-hover:text-[#c45c6a] group-hover:scale-105 transition-all duration-300 origin-left">{title}</h3>
+                <p className="text-stone-700 text-sm leading-relaxed mb-4">{text}</p>
+                <p className="text-[#c45c6a] text-xs">{tech}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
 
-        <p className="text-sm text-gray-400">
-          {stat.label}
-        </p>
-      </motion.div>
-    ))}
-  </div>
-</section>
-
-{/* WHY WORK WITH ME */}
-<section className="py-20 px-6">
-  <div className="max-w-5xl mx-auto">
-
-    <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-      Why Work With Me
-    </h2>
-
-    <p className="text-center text-gray-400 max-w-2xl mx-auto mb-12">
-      I focus on building reliable, practical, and business-focused web
-      solutions — not just writing code.
-    </p>
-
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <div className="text-3xl mb-4">💼</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
-          Professional Experience
-        </h3>
-        <p className="text-gray-400 text-sm leading-6">
-          2+ years of professional development experience working on
-          real-world web applications and business projects.
-        </p>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <div className="text-3xl mb-4">🚀</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
-          Freelance Experience
-        </h3>
-        <p className="text-gray-400 text-sm leading-6">
-          8+ months of freelancing experience focused on understanding
-          client requirements and delivering practical solutions.
-        </p>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <div className="text-3xl mb-4">🎯</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
-          Business-Focused
-        </h3>
-        <p className="text-gray-400 text-sm leading-6">
-          I build websites and applications with usability, performance,
-          scalability, and business goals in mind.
-        </p>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <div className="text-3xl mb-4">⚡</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
-          Clean & Scalable Code
-        </h3>
-        <p className="text-gray-400 text-sm leading-6">
-          Structured code and reusable components make applications easier
-          to maintain, improve, and scale.
-        </p>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <div className="text-3xl mb-4">🤝</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
-          Clear Communication
-        </h3>
-        <p className="text-gray-400 text-sm leading-6">
-          Clear communication throughout the project helps keep
-          requirements, progress, and expectations aligned.
-        </p>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <div className="text-3xl mb-4">🔧</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
-          End-to-End Support
-        </h3>
-        <p className="text-gray-400 text-sm leading-6">
-          From development and API integration to bug fixing and
-          performance improvements, I can support the complete workflow.
-        </p>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-
-{/* TESTIMONIALS */}
-<section id="testimonials" className="py-20 px-6">
-  <div className="max-w-6xl mx-auto">
-
-    <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-      Client Feedback
-    </h2>
-
-    <p className="text-center text-gray-400 max-w-2xl mx-auto mb-12">
-      Real project experiences from clients I've worked with.
-    </p>
-
-    <div className="grid md:grid-cols-3 gap-6">
-
-      {/* TESTIMONIAL 1 */}
-      <motion.div
-        whileHover={{ y: -6 }}
-        className="p-7 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition"
-      >
-        <div className="text-cyan-400 text-4xl mb-4">
-          “
-        </div>
-
-        <p className="text-gray-300 leading-7 mb-6">
-          Trupti delivered our dashboard faster than expected and the code
-          quality was excellent.
-        </p>
-
-        <div>
-          <p className="text-white font-semibold">
-            Startup Founder
-          </p>
-
-          <p className="text-gray-500 text-sm">
-            Dashboard Project
-          </p>
-        </div>
-      </motion.div>
-
-      {/* TESTIMONIAL 2 */}
-      <motion.div
-        whileHover={{ y: -6 }}
-        className="p-7 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition"
-      >
-        <div className="text-cyan-400 text-4xl mb-4">
-          “
-        </div>
-
-        <p className="text-gray-300 leading-7 mb-6">
-          Our internal CRM became much faster and easier to manage after
-          her improvements.
-        </p>
-
-        <div>
-          <p className="text-white font-semibold">
-            Operations Manager
-          </p>
-
-          <p className="text-gray-500 text-sm">
-            CRM & Performance Project
-          </p>
-        </div>
-      </motion.div>
-
-      {/* TESTIMONIAL 3 */}
-      <motion.div
-        whileHover={{ y: -6 }}
-        className="p-7 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition"
-      >
-        <div className="text-cyan-400 text-4xl mb-4">
-          ★
-        </div>
-
-        <p className="text-gray-300 leading-7 mb-6">
-          Successfully delivered a web development project with a strong
-          focus on requirements, usability, and reliable implementation.
-        </p>
-
-        <div>
-          <p className="text-white font-semibold">
-            Happy Client
-          </p>
-
-          <p className="text-gray-500 text-sm">
-            Web Development Project
-          </p>
-        </div>
-      </motion.div>
-
-    </div>
-
-    <div className="text-center mt-10">
-      <a
-        href="#contact"
-        className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:scale-105 transition"
-      >
-        Start Your Project
-        <span>→</span>
-      </a>
-    </div>
-
-  </div>
-</section>
-     {/* CONTACT */}
-<section id="contact" className="py-20 px-6">
-  <div className="max-w-6xl mx-auto">
-
-    {/* Heading */}
-    <div className="text-center mb-12">
-      <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-        Let's Build Something Great
-      </h2>
-
-      <p className="text-gray-400 max-w-2xl mx-auto">
-        Have a website, web application, SaaS idea, or an existing project
-        that needs improvement? Tell me what you're building.
-      </p>
-    </div>
-
-    <div className="grid lg:grid-cols-2 gap-10 items-start">
-
-      {/* LEFT - CONTACT INFORMATION */}
-      <div className="space-y-6">
-
-        <div>
-          <h3 className="text-2xl font-semibold text-white mb-3">
-            Start a Conversation
+        <Reveal className="mt-24">
+          <h3 style={serif} className="text-3xl md:text-4xl font-semibold text-center mb-3 text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default">
+            Introductory Pricing
           </h3>
-
-          <p className="text-gray-400 leading-7">
-            Share your requirements, project idea, timeline, or current
-            website. I'll get back to you and we can discuss the best
-            approach for your project.
+          <p className="text-stone-600 text-center max-w-2xl mx-auto mb-10 leading-relaxed text-sm">
+            Starting ranges for the first few suitably scoped projects. Every quote is confirmed after we discuss requirements.
           </p>
-        </div>
-
-        {/* Email */}
-        <a
-          href="mailto:mishratrupti971@gmail.com"
-          className="block p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 transition"
-        >
-          <p className="text-gray-500 text-sm mb-1">
-            Email
-          </p>
-
-          <p className="text-white break-all">
-            mishratrupti971@gmail.com
-          </p>
-        </a>
-
-        {/* Phone */}
-        <a
-          href="tel:+919594932292"
-          className="block p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 transition"
-        >
-          <p className="text-gray-500 text-sm mb-1">
-            Phone
-          </p>
-
-          <p className="text-white">
-            +91 95949 32292
-          </p>
-        </a>
-
-        {/* Freelance Availability */}
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
-          <p className="text-cyan-400 font-semibold mb-2">
-            Available for Freelance Projects
-          </p>
-
-          <p className="text-gray-400 text-sm leading-6">
-            Business websites, landing pages, dashboards, custom web
-            applications, SaaS/MVP development, REST APIs, bug fixes,
-            and performance optimization.
-          </p>
-        </div>
-
-        {/* Social Links */}
-        <div className="flex flex-wrap gap-4">
-
-          <a
-            href="https://www.linkedin.com/in/truptimishra-366545243"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:border-cyan-400/50 transition"
-          >
-            LinkedIn
-          </a>
-
-          <a
-            href="https://leetcode.com/u/truptimishra047/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:border-cyan-400/50 transition"
-          >
-            LeetCode
-          </a>
-
-        </div>
-
-      </div>
-
-      {/* RIGHT - CONTACT FORM */}
-      <motion.div
-        whileHover={{ y: -3 }}
-        className="rounded-3xl bg-black/50 backdrop-blur-xl border border-white/10 p-6 md:p-8"
-      >
-
-        {formStatus === "success" ? (
-          <div className="text-center py-10">
-            <div className="text-4xl mb-4">✅</div>
-            <h3 className="text-2xl font-semibold text-white mb-2">
-              Message Sent
-            </h3>
-            <p className="text-gray-400">
-              Thanks for reaching out — I'll get back to you soon.
-            </p>
-            <button
-              onClick={() => setFormStatus("idle")}
-              className="mt-6 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:border-cyan-400/50 transition"
-            >
-              Send Another Message
-            </button>
+          <div className="grid md:grid-cols-2 gap-5">
+            {pricing.map(([name, range, note]) => (
+              <div key={name} className={`${card} p-6 group`}>
+                <p className="text-sm text-stone-600 mb-1 group-hover:text-[#c45c6a] transition-colors">{name}</p>
+                <p style={serif} className="text-2xl md:text-3xl text-stone-900 my-2 group-hover:scale-105 transition-transform origin-left">{range}</p>
+                <p className="text-sm text-stone-700 leading-relaxed">{note}</p>
+              </div>
+            ))}
           </div>
-        ) : (
-          <form onSubmit={handleContactSubmit} className="space-y-5">
+          <p className="text-center text-xs text-stone-500 mt-8 max-w-3xl mx-auto leading-relaxed">
+            Scope, deliverables, timeline, revisions, payment milestones, hosting/domain costs, third-party fees and change-request pricing are confirmed in writing before I start.
+          </p>
+        </Reveal>
 
-            {/* Name */}
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                Your Name
-              </label>
+        <Reveal className="text-center mt-14">
+          <p className="text-stone-600 mb-5">Have a project in mind? Let's build something that works for your business.</p>
+          <CtaButton>Let's Work Together</CtaButton>
+        </Reveal>
+      </section>
 
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter your name"
-                required
-                className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 outline-none focus:border-cyan-400/60 transition"
-              />
+      {/* PROCESS */}
+      <section id="process" className="max-w-6xl mx-auto px-6 py-28 border-t border-stone-100 relative">
+        <Heading
+          eyebrow="Simple & Transparent"
+          title="How I Work With Clients"
+          text="A clear process keeps your project organized, predictable and focused on the final business goal."
+        />
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {processSteps.map(([num, icon, title, desc], i) => (
+            <Reveal key={title} delay={i * 0.06}>
+              <div className={`${card} group h-full p-6`}>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center text-xl group-hover:scale-125 transition-transform duration-300">{icon}</div>
+                  <span className="text-3xl font-light text-stone-300 group-hover:text-stone-400 transition-colors">{num}</span>
+                </div>
+                <h3 className="text-lg font-medium mb-2 text-stone-900 group-hover:text-[#c45c6a] group-hover:scale-105 transition-all duration-300 origin-left">{title}</h3>
+                <p className="text-stone-700 text-sm leading-relaxed">{desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal className="mt-14 rounded-2xl border border-stone-200 bg-stone-50/80 p-8 md:p-10 text-center shadow-sm">
+          <h3 style={serif} className="text-2xl md:text-3xl font-semibold mb-3 text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default">
+            Have an idea? Let’s turn it into a working product.
+          </h3>
+          <p className="text-stone-600 max-w-xl mx-auto mb-6 text-sm leading-relaxed">
+            Share your requirements and I’ll help you choose the right approach, features and technology.
+          </p>
+          <CtaButton>Start a Conversation</CtaButton>
+        </Reveal>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="py-28 px-6 max-w-5xl mx-auto border-t border-stone-100 relative">
+        <Reveal className={`${card} relative overflow-hidden p-8 md:p-12`}>
+          <div className="relative z-10">
+            <div className="text-center mb-10">
+              <p className="text-[#c45c6a] text-xs font-medium uppercase tracking-[0.28em] mb-3 hover:scale-110 hover:tracking-[0.32em] transition-all duration-300 cursor-default">About Me</p>
+              <h2 style={serif} className="text-3xl md:text-5xl font-semibold text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default">
+                Turning Ideas Into Digital Experiences
+              </h2>
             </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                Your Email
-              </label>
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                required
-                className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 outline-none focus:border-cyan-400/60 transition"
-              />
-            </div>
-
-            {/* Message */}
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                Project Details
-              </label>
-
-              <textarea
-                name="message"
-                rows="6"
-                placeholder="Tell me about your project, requirements, timeline, or budget..."
-                required
-                className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 outline-none focus:border-cyan-400/60 transition resize-none"
-              />
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={formStatus === "sending"}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:scale-[1.02] transition disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {formStatus === "sending" ? "Sending..." : "Send Project Enquiry →"}
-            </button>
-
-            {formStatus === "error" && (
-              <p className="text-center text-red-400 text-sm">
-                Something went wrong. Please try again or email me directly.
+            <div className="max-w-3xl mx-auto text-center space-y-5">
+              <p className="text-stone-700 leading-relaxed">
+                I’m Trupti Mishra, a Full-Stack Developer with <span className="text-stone-900 font-medium">2+ years of professional experience</span> and <span className="text-stone-900 font-medium">8+ months of freelancing experience</span>.
               </p>
-            )}
+              <p className="text-stone-700 leading-relaxed">
+                I build modern, responsive websites and web applications for businesses, startups and entrepreneurs. From business websites and landing pages to backends, APIs and scoped improvements, I focus on solutions that are reliable and easy to use.
+              </p>
+              <p className="text-stone-700 leading-relaxed">
+                My goal is simple — understand your business, turn your idea into a professional digital product, and deliver something that helps you achieve your goals.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+              {aboutStats.map(([title, text], i) => (
+                <Reveal key={text} delay={i * 0.06}>
+                  <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 text-center hover:scale-105 hover:border-[#c45c6a]/40 transition-all duration-300 cursor-default">
+                    <p className="text-2xl font-semibold text-stone-900 hover:text-[#c45c6a] transition-colors">{title}</p>
+                    <p className="text-xs text-stone-600 mt-1">{text}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+            <div className="mt-10 text-center">
+              <p className="text-xs text-stone-500 mb-3 tracking-wide">Core Technologies</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {coreTech.map((t) => (
+                  <span key={t} className="px-3.5 py-1.5 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-sm hover:bg-[#c45c6a]/10 hover:text-[#c45c6a] hover:border-[#c45c6a]/40 hover:scale-110 transition-all duration-200 cursor-default">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </section>
 
-            <p className="text-center text-gray-500 text-xs">
-              Quick response • Fixed-price / milestone payments • NDA available
-            </p>
+      {/* TRUSTED TECH */}
+      <section className="py-20 px-6 text-center border-t border-stone-100 relative">
+        <Reveal className="max-w-4xl mx-auto">
+          <p className="text-[#c45c6a] text-xs font-medium uppercase tracking-[0.28em] mb-4 hover:scale-110 hover:tracking-[0.32em] transition-all duration-300 cursor-default">
+            Technologies I Work With
+          </p>
+          <h2 style={serif} className="text-3xl md:text-4xl font-semibold mb-4 text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default">
+            Built With Modern Technology
+          </h2>
+          <p className="text-stone-600 max-w-xl mx-auto mb-10 text-sm leading-relaxed">
+            Reliable tools for responsive websites, scalable applications and clean backend systems.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2.5">
+            {trustedTech.map((t) => (
+              <span key={t} className="px-4 py-2 rounded-full bg-white border border-stone-200 text-stone-700 text-sm hover:border-[#c45c6a]/50 hover:text-[#c45c6a] hover:scale-110 hover:shadow-sm transition-all duration-200 cursor-default">
+                {t}
+              </span>
+            ))}
+          </div>
+        </Reveal>
+      </section>
 
-          </form>
-        )}
+      {/* SKILLS */}
+      <section id="skills" className="py-28 px-6 border-t border-stone-100 relative">
+        <div className="max-w-6xl mx-auto">
+          <Heading
+            eyebrow="My Expertise"
+            title="Skills & Expertise"
+            text="From frontend experiences to backend systems, I build complete, reliable digital solutions."
+          />
+          <div className="grid md:grid-cols-3 gap-6">
+            {skillGroups.map((g, i) => (
+              <Reveal key={g.title} delay={i * 0.08} hover>
+                <div className={`${card} h-full overflow-hidden group`}>
+                  <div className="relative h-40 overflow-hidden">
+                    <img src={g.img} alt={`${g.title} development`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
+                  <div className="p-6">
+                    <h3 style={serif} className="text-xl font-semibold mb-3 text-stone-900 group-hover:text-[#c45c6a] group-hover:scale-105 transition-all duration-300 origin-left">
+                      {g.title}
+                    </h3>
+                    <p className="text-stone-700 text-sm leading-relaxed mb-5">{g.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {g.items.map((item) => (
+                        <span key={item} className={pill + " hover:bg-[#c45c6a]/10 hover:text-[#c45c6a] hover:border-[#c45c6a]/40 hover:scale-105 transition-all duration-200"}>
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3">
+            {clientSkills.map((item) => (
+              <div key={item} className="bg-white border border-stone-200 rounded-xl p-4 text-center shadow-sm hover:scale-105 hover:border-[#c45c6a]/40 hover:shadow-md transition-all duration-300 cursor-default">
+                <p className="text-stone-700 text-sm">✓ {item}</p>
+              </div>
+            ))}
+          </Reveal>
+        </div>
+      </section>
 
-      </motion.div>
+      {/* EXPERIENCE */}
+      <section id="experience" className="max-w-6xl mx-auto px-6 py-28 border-t border-stone-100 relative">
+        <Heading
+          eyebrow="My Background"
+          title="Professional Experience"
+          text="Professional experience building full-stack applications, business systems, APIs and scalable web solutions."
+        />
+        <div className="relative">
+          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-stone-200" />
+          <div className="space-y-8">
+            {experience.map((exp, i) => (
+              <Reveal key={exp.company} delay={i * 0.08} className={`relative md:w-[calc(50%-28px)] ${i % 2 === 0 ? "md:mr-auto" : "md:ml-auto"}`}>
+                <div className={`hidden md:block absolute top-8 w-2.5 h-2.5 rounded-full bg-[#c45c6a] border-2 border-white shadow-sm ${i % 2 === 0 ? "-right-[35px]" : "-left-[35px]"}`} />
+                <div className={`${card} p-7 group`}>
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <span className="text-[11px] uppercase tracking-[0.15em] text-stone-500">Professional Experience</span>
+                    <span className="text-[11px] px-2.5 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-600">{exp.tag}</span>
+                  </div>
+                  <h3 style={serif} className="text-2xl font-semibold mb-1 text-stone-900 group-hover:text-[#c45c6a] group-hover:scale-105 transition-all duration-300 origin-left">
+                    {exp.role}
+                  </h3>
+                  <p className="text-[#c45c6a] text-sm mb-4">{exp.company}</p>
+                  <p className="text-stone-700 text-sm leading-relaxed mb-5">{exp.desc}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {exp.skills.map((s) => (
+                      <span key={s} className="text-xs px-2.5 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-600 hover:bg-[#c45c6a]/10 hover:text-[#c45c6a] hover:border-[#c45c6a]/40 hover:scale-105 transition-all duration-200 cursor-default">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+        <div className="mt-16 grid sm:grid-cols-3 gap-4">
+          {experienceStats.map(([value, label], i) => (
+            <Reveal key={label} delay={i * 0.08}>
+              <div className="text-center rounded-xl border border-stone-200 bg-white p-6 shadow-sm hover:scale-105 hover:border-[#c45c6a]/40 transition-all duration-300 cursor-default">
+                <div className="text-2xl font-semibold text-stone-900 mb-1 hover:text-[#c45c6a] transition-colors">{value}</div>
+                <p className="text-xs text-stone-600">{label}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
 
-    </div>
+      {/* WHY WORK WITH ME */}
+      <section className="py-28 px-6 border-t border-stone-100 relative">
+        <div className="max-w-5xl mx-auto">
+          <Heading title="Why Work With Me" text="I focus on building reliable, practical and business-focused web solutions — not just writing code." />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {whyMe.map(([icon, title, text], i) => (
+              <Reveal key={title} delay={i * 0.04}>
+                <div className={`${card} h-full p-6 group`}>
+                  <div className="text-2xl mb-4 group-hover:scale-125 transition-transform duration-300">{icon}</div>
+                  <h3 className="text-lg font-medium mb-2 text-stone-900 group-hover:text-[#c45c6a] group-hover:scale-105 transition-all duration-300 origin-left">{title}</h3>
+                  <p className="text-stone-700 text-sm leading-relaxed">{text}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
-  </div>
-</section>
+      {/* TESTIMONIALS — strong visible backgrounds */}
+      <section id="testimonials" className="py-28 px-6 border-t border-stone-100 relative">
+        <div className="max-w-6xl mx-auto">
+          <Heading title="Client Feedback" text="Real project experiences from clients I've worked with." />
+          <div className="grid md:grid-cols-3 gap-5">
+            {testimonials.map(([mark, quote, who, project, bgImage], i) => (
+              <Reveal key={who} delay={i * 0.06} hover>
+                <div className={`${card} group h-full relative overflow-hidden min-h-[320px]`}>
+                  
+                  {/* Background image — strong & visible */}
+                  <div
+                    className="absolute inset-0 transition-all duration-500 group-hover:scale-110"
+                    style={{
+                      backgroundImage: `url(${bgImage})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      opacity: 0.55,
+                    }}
+                  />
+                  
+                  {/* Soft overlay — enough for text, not enough to hide image */}
+                  <div className="absolute inset-0 bg-white/55 group-hover:bg-white/50 transition-colors duration-500" />
+
+                  {/* Content */}
+                  <div className="relative z-10 p-7 flex flex-col h-full">
+                    <div className="text-[#c45c6a] text-3xl mb-4 group-hover:scale-125 transition-transform duration-300">
+                      {mark}
+                    </div>
+                    <p className="text-stone-900 leading-relaxed mb-6 text-sm font-medium flex-1">
+                      {quote}
+                    </p>
+                    <div>
+                      <p className="font-semibold text-stone-900 text-sm group-hover:text-[#c45c6a] transition-colors">
+                        {who}
+                      </p>
+                      <p className="text-stone-600 text-xs mt-0.5">{project}</p>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal className="text-center mt-12">
+            <CtaButton>Start Your Project</CtaButton>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" className="py-28 px-6 border-t border-stone-100 relative">
+        <div className="max-w-6xl mx-auto">
+          <Heading
+            title="Let's Build Something Great"
+            text="Have a website, booking system, backend work or an existing project that needs improvement? Tell me what you're building."
+          />
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="space-y-5">
+              <div>
+                <h3 style={serif} className="text-2xl font-semibold mb-3 text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default origin-left">
+                  Start a Conversation
+                </h3>
+                <p className="text-stone-700 leading-relaxed text-sm">
+                  Share your requirements, project idea, timeline or current website. I’ll get back to you and we can discuss the best approach.
+                </p>
+              </div>
+              {[
+                ["mailto:mishratrupti971@gmail.com", "Email", "mishratrupti971@gmail.com", true],
+                ["https://wa.me/919594932292", "WhatsApp", "+91 95949 32292", false],
+                ["tel:+919594932292", "Phone", "+91 95949 32292", false],
+              ].map(([href, label, value, breakAll]) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={label === "WhatsApp" ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                  className="block p-5 rounded-xl bg-white border border-stone-200 hover:border-[#c45c6a]/50 hover:scale-[1.02] hover:shadow-md transition-all duration-300"
+                >
+                  <p className="text-stone-500 text-xs mb-1 tracking-wide">{label}</p>
+                  <p className={`text-stone-800 text-sm ${breakAll ? "break-all" : ""}`}>{value}</p>
+                </a>
+              ))}
+              <div className="p-5 rounded-xl bg-stone-50 border border-stone-200">
+                <p className="text-[#c45c6a] font-medium text-sm mb-2">Available for Freelance Projects</p>
+                <p className="text-stone-700 text-sm leading-relaxed">
+                  Business websites, landing pages, Laravel backends and APIs, bug fixes, maintenance, and dashboards or custom applications on request.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3 pt-1">
+                {[
+                  ["https://www.linkedin.com/in/truptimishra-366545243", "LinkedIn"],
+                  ["https://leetcode.com/u/truptimishra047/", "LeetCode"],
+                  ["https://www.instagram.com/mis_trupm", "Instagram"],
+                ].map(([href, label]) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 rounded-lg bg-white border border-stone-200 text-stone-700 text-sm hover:text-[#c45c6a] hover:border-[#c45c6a]/50 hover:scale-110 transition-all duration-300"
+                  >
+                    {label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white border border-stone-200 p-6 md:p-8 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.08)]">
+              {formStatus === "success" ? (
+                <div className="text-center py-12" role="status">
+                  <div className="text-3xl mb-4 text-emerald-500">✓</div>
+                  <h3 style={serif} className="text-2xl font-semibold mb-2 text-stone-900">Message Sent</h3>
+                  <p className="text-stone-700 text-sm">Thanks for reaching out — I’ll get back to you soon.</p>
+                  <button onClick={() => setFormStatus("idle")} className="mt-6 px-5 py-2.5 rounded-lg bg-stone-100 border border-stone-200 text-stone-700 text-sm hover:text-stone-900 hover:scale-105 transition-all">
+                    Send Another Message
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleContactSubmit} className="space-y-5">
+                  <Field label="Your Name">
+                    <input type="text" name="name" placeholder="Enter your name" required className={inputCls} />
+                  </Field>
+                  <Field label="Your Email">
+                    <input type="email" name="email" placeholder="Enter your email" required className={inputCls} />
+                  </Field>
+                  <Field label="Project Details">
+                    <textarea name="message" rows="5" placeholder="Tell me about your project, requirements, timeline or budget..." required className={`${inputCls} resize-none`} />
+                  </Field>
+                  <button type="submit" disabled={formStatus === "sending"} className={`${btnPrimary} w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed`}>
+                    {formStatus === "sending" ? "Sending..." : "Send Project Enquiry →"}
+                  </button>
+                  {formStatus === "error" && (
+                    <p role="alert" className="text-center text-red-600 text-sm">Something went wrong. Please try again or email me directly.</p>
+                  )}
+                  <p className="text-center text-stone-500 text-xs">Quick response · Written milestones & payment terms · NDA available</p>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER */}
-<footer className="border-t border-white/10 bg-black/40 px-6 py-10">
-  <div className="max-w-6xl mx-auto">
+      <footer className="border-t border-stone-200 bg-stone-50 px-6 py-12 relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <h3 style={serif} className="text-xl font-semibold text-stone-900 hover:text-[#c45c6a] hover:scale-105 transition-all duration-300 cursor-default">
+                Trupti Mishra
+              </h3>
+              <p className="text-stone-600 text-sm mt-1">Freelance Full-Stack Developer</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              {[
+                ["Home", "#home"],
+                ["Projects", "#projects"],
+                ["Services", "#services"],
+                ["Testimonials", "#testimonials"],
+                ["Contact", "#contact"],
+              ].map(([l, h]) => (
+                <a key={l} href={h} className="text-stone-600 hover:text-[#c45c6a] hover:scale-110 transition-all duration-300">
+                  {l}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="border-t border-stone-200 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-stone-600 text-sm text-center">© {new Date().getFullYear()} Trupti Mishra. All rights reserved.</p>
+            <p className="text-stone-500 text-xs text-center">React · Laravel · MySQL · REST APIs</p>
+          </div>
+        </div>
+      </footer>
 
-    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-
-      {/* Brand */}
-      <div className="text-center md:text-left">
-        <h3 className="text-xl font-bold text-white">
-          Trupti Mishra
-        </h3>
-
-        <p className="text-gray-500 text-sm mt-1">
-          Freelance Full-Stack Developer
-        </p>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex flex-wrap justify-center gap-5 text-sm">
-        <a
-          href="#home"
-          className="text-gray-400 hover:text-cyan-400 transition"
-        >
-          Home
-        </a>
-
-        <a
-          href="#projects"
-          className="text-gray-400 hover:text-cyan-400 transition"
-        >
-          Projects
-        </a>
-
-        <a
-          href="#services"
-          className="text-gray-400 hover:text-cyan-400 transition"
-        >
-          Services
-        </a>
-
-        <a
-          href="#testimonials"
-          className="text-gray-400 hover:text-cyan-400 transition"
-        >
-          Testimonials
-        </a>
-
-        <a
-          href="#contact"
-          className="text-gray-400 hover:text-cyan-400 transition"
-        >
-          Contact
-        </a>
-      </div>
-
-    </div>
-
-    <div className="border-t border-white/10 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-
-      <p className="text-gray-500 text-sm text-center">
-        © {new Date().getFullYear()} Trupti Mishra. All rights reserved.
-      </p>
-
-      <p className="text-gray-600 text-xs text-center">
-        React • Laravel • MySQL • REST APIs
-      </p>
-
-    </div>
-
-  </div>
-</footer>
+      <ConnectModal isOpen={modalOpen} onClose={() => setModalOpen(false)} type={modalType} />
     </div>
   );
 }
